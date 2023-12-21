@@ -6,6 +6,47 @@ __author__ = "Umayeer Ahsan"
 
 import display
 
+
+# Constants
+
+
+# Global Variables
+Settings = {
+    "surrendering": {
+        default: False,
+        displayName: "Surrendering Enabled",
+        desc: "When true, enables the option to surrender on the first round.\nUser loses but receives half of their bet back."
+    },
+    "doubling": {
+        default: True,
+        displayName: "Doubling Enabled",
+        desc: "When true, enables the option to double the user's bet on the first round.\nUser receives one final card and then their turn ends."
+    },
+    "splitting": {
+        default: True,
+        displayName: "Splitting Enabled",
+        desc: "When true, enables the option to split on the first round if the user has two of the same value cards.\nEach card is now played as a separate hand."
+    },
+    "soft_17_hit": {
+        default: True,
+        displayName: "Dealer Hits on Soft 17",
+        desc: "When true, dealer must hit on a soft 17. Otherwise, the dealer stands."
+    },
+    "true_random": {
+        default: False,
+        displayName: "True random cards.",
+        desc: "Uses truely (pseudo) random cards instead of using a specific number of decks.\nUse this if you hate card counters.\nWhen true, the 'Deck Count' setting does nothing."
+    },
+    "deck_count": {
+        default: 6,
+        displayName: "Deck Count",
+        min_: 1,
+        max_: 12,
+        desc: "The number of decks to use when dealing. Each card has an equal weight in the deck.\nInput a number between 1 and 12 (inclusive)."
+    }
+}
+
+
 def get_int(message: str) -> int:
     '''Prompt the user with message to enter an integer to be returned.'''
     
@@ -64,9 +105,7 @@ def main():
             display.goodbye()
             
             break
-    
-    
-
+        
 
 if __name__ == "__main__":
     main()
