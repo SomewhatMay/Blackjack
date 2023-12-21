@@ -11,38 +11,38 @@ import display
 
 
 # Global Variables
-Settings = {
+settings = {
     "surrendering": {
-        default: False,
-        displayName: "Surrendering Enabled",
-        desc: "When true, enables the option to surrender on the first round.\nUser loses but receives half of their bet back."
+        "default": False,
+        "display_name": "Surrendering Enabled",
+        "description": "When true, enables the option to surrender on the first round.\nUser loses but receives half of their bet back."
     },
     "doubling": {
-        default: True,
-        displayName: "Doubling Enabled",
-        desc: "When true, enables the option to double the user's bet on the first round.\nUser receives one final card and then their turn ends."
+        "default": True,
+        "display_name": "Doubling Enabled",
+        "description": "When true, enables the option to double the user's bet on the first round.\nUser receives one final card and then their turn ends."
     },
     "splitting": {
-        default: True,
-        displayName: "Splitting Enabled",
-        desc: "When true, enables the option to split on the first round if the user has two of the same value cards.\nEach card is now played as a separate hand."
+        "default": True,
+        "display_name": "Splitting Enabled",
+        "description": "When true, enables the option to split on the first round if the user has two of the same value cards.\nEach card is now played as a separate hand."
     },
     "soft_17_hit": {
-        default: True,
-        displayName: "Dealer Hits on Soft 17",
-        desc: "When true, dealer must hit on a soft 17. Otherwise, the dealer stands."
+        "default": True,
+        "display_name": "Dealer Hits on Soft 17",
+        "description": "When true, dealer must hit on a soft 17. Otherwise, the dealer stands."
     },
     "true_random": {
-        default: False,
-        displayName: "True random cards.",
-        desc: "Uses truely (pseudo) random cards instead of using a specific number of decks.\nUse this if you hate card counters.\nWhen true, the 'Deck Count' setting does nothing."
+        "default": False,
+        "display_name": "True random cards.",
+        "description": "Uses truely (pseudo) random cards instead of using a specific number of decks.\nUse this if you hate card counters.\nWhen true, the 'Deck Count' setting does nothing."
     },
     "deck_count": {
-        default: 6,
-        displayName: "Deck Count",
-        min_: 1,
-        max_: 12,
-        desc: "The number of decks to use when dealing. Each card has an equal weight in the deck.\nInput a number between 1 and 12 (inclusive)."
+        "default": 6,
+        "display_name": "Deck Count",
+        "max": 1,
+        "min": 12,
+        "description": "The number of decks to use when dealing. Each card has an equal weight in the deck.\nInput a number between 1 and 12 (inclusive)."
     }
 }
 
@@ -68,10 +68,23 @@ def get_int_range(message: str, min_: int, max_: int) -> int:
     while True:
         n = get_int(message)
         
-        if min <= n < max_:
+        if min_ <= n < max_:
             return n
         else:
             print(f"Input out of range. Try a value between {min_} (inclusive) and {max_} (exclusive)")
+
+
+def get_decision(message: str, choices: [str]):
+    '''Prompt the user with the message 
+    and retrieve a valid decision present in choices.'''
+    
+    while True:
+        decision = input(message).lower()
+        
+        if decision in choices:
+            return decision
+        else:
+            print("Please choose a valid option. Try again.")
 
 
 def start_game():
@@ -79,7 +92,23 @@ def start_game():
 
 
 def toggle_settings():
-    pass
+    display.settings_menu(settings)
+    
+    choice = get_int_range("Select a setting: ", 1, len(settings) + 1)
+    # Find the setting in position choice
+    setting = list(settings.values())[choice]
+    print("Would you like to:\n  (c)hange the setting\n  (r)ead a description")
+    decision = get_decision("> ", ['c', 'r'])
+    
+    if decision == 'c':
+        print(f"Current Value: {setting['value']}")
+        
+        if type(setting["value"]) is bool:
+            print("Type 0 for False and 1 for True.")
+        elif type(setting["value"]) is int:
+            if "min" in setting.keys():
+                print(f"Enter a value from {setting['min']} to {setting['max']} (inclusive)")
+            
 
 
 def start_tutorial():
@@ -89,6 +118,10 @@ def start_tutorial():
 def main():
     '''The main function that handles the primary input and logic of the game interface.'''
     
+    # Add a 'value' key into each setting and set it as the default
+    for setting in settings.values():
+        setting["value"] = setting["default"]
+
     display.intro()
     
     while True:

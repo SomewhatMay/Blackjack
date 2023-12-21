@@ -4,9 +4,6 @@
 __author__ = "Umayeer Ahsan"
 
 
-import main
-
-
 def intro():
     '''Display the introduction of the game which 
     only plays at the beginning of the game.'''
@@ -15,13 +12,15 @@ def intro():
     print("BLACKJACK!")
 
 
-def settings():
-    '''DIsplay the settings interface'''
+def settings_menu(settings):
+    '''Display the settings interface'''
 
     print("--------------- SETTINGS ---------------")
     
-    for setting in main.Settings.items():
-        print(f"{setting.displayName}:\t\t{settings.value}")
+    counter = 0
+    for setting in settings.values():
+        counter +=1
+        print(f"{counter}. {(setting['display_name']):<30}{setting['value']}")
 
 
 def menu():
@@ -31,9 +30,8 @@ def menu():
     print("--------------- MENU ---------------")
     print("1. Start game")
     print("2. Options")
-    print("4. Tutorial")
-    print("3. Exit")
-    print("Make a choice") # TODO Might be redundant
+    print("3. Tutorial")
+    print("4. Exit")
     
 
 def goodbye():
