@@ -4,6 +4,80 @@
 __author__ = "Umayeer Ahsan"
 
 
+suit_symbols = {
+    'spades': '♠',
+    'hearts': '♥',
+    'diamonds': '♦',
+    'clubs': '♣',
+}
+
+def get_lines(drawings: [str]) -> [str]:
+    result = []
+    
+    COMPLETED = False
+    start = 0
+    
+    while not COMPLETED:
+        current_line = ""
+        
+        for i in range(0, len(drawings)):
+            drawing = drawings[i]
+            new_line_index = drawing.find('\n')
+            
+            if new_line_index == -1:
+                COMPLETED = True
+                current_line += drawing
+            else:
+                current_line += drawing[:new_line_index]
+                drawings[i] = drawing[new_line_index + 1:]
+        
+        result.append(current_line)
+
+    return result
+            
+
+
+def hand(cards: [dict]):
+    card_drawings = []
+    
+    for i in range(0, len(cards)):
+        card = cards[i]
+        suit_symbol = suit_symbols[card["suit"]]
+        rank = card["rank"]
+        
+        if i == 0:
+            card_drawings.append(f"""╔═══════════╗
+║         {rank:<2}║
+║         {suit_symbol} ║
+║           ║
+║  ╚═════╗  ║
+║  ║  {suit_symbol}  ║  ║
+║  ╚═════╗  ║
+║           ║
+║ {suit_symbol}         ║
+║{rank:>2}         ║
+╚═══════════╝""")
+        else:
+            card_drawings.append(f"""═══╗
+ {rank:<2}║
+ {suit_symbol} ║
+   ║
+╗  ║
+║  ║
+╗  ║
+   ║
+   ║
+   ║
+═══╝""")
+    
+    output_lines = get_lines(card_drawings)
+    
+    for line in output_lines:
+        print(line)
+    
+    print()
+
+
 def intro():
     '''Display the introduction of the game which 
     only plays at the beginning of the game.'''
@@ -24,6 +98,7 @@ def settings_menu(settings):
         print(f"{counter}. {(setting['display_name']):<30}{setting['value']}")
 
 
+# HACK nullable/default parameter
 def await_continue(message: str = "[press enter to continue...]"):
     '''Waits for the user to want to continue by asking for an empty input.'''
     

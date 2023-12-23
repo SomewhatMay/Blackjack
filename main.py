@@ -5,12 +5,13 @@ __author__ = "Umayeer Ahsan"
 
 
 import display
+import random
 
 
-# Constants
+## Constants ##
 
 
-# Global Variables
+## Global Variables ##
 settings = {
     "surrendering": {
         "default": False,
@@ -33,15 +34,15 @@ settings = {
         "description": "When true, dealer must hit on a soft 17. Otherwise, the dealer stands."
     },
     "true_random": {
-        "default": False,
+        "default": True,
         "display_name": "True Random Cards.",
         "description": "Uses truely (pseudo) random cards instead of using a specific number of decks.\nUse this if you hate card counters.\nWhen true, the 'Deck Count' setting does nothing."
     },
     "deck_count": {
         "default": 6,
         "display_name": "Deck Count",
-        "max": 1,
-        "min": 12,
+        "min": 1,
+        "max": 12,
         "description": "The number of decks to use when dealing. Each card has an equal weight in the deck.\nInput a number between 1 and 12 (inclusive)."
     },
     
@@ -57,6 +58,11 @@ settings = {
     }
 }
 
+suits = ["clubs", "diamonds", "spades", "hearts"]
+ranks = [] # HACK loaded during runtime - is this okay?
+hands = []
+remaining_cards = {}
+remaining_suits = {}
 
 def get_int(message: str) -> int:
     '''Prompt the user with message to enter an integer to be returned.'''
@@ -97,11 +103,37 @@ def get_decision(message: str, choices: [str]):
         else:
             print("Please choose a valid option. Try again.")
 
+## Main game functions ##
+def draw_card() -> dict:
+    '''Get a random card from the deck and return its information.'''
+    
+    if settings["true_random"]["value"] == True:
+        rank = random.choice(ranks)
+        suit = random.choice(suits)
+    else:
+        # HACK random.choices; the hacky indexing;
+        # FIXME might have to cast to list before this function works
+        rank = random.choices(remaining_cards.keys(), weights=remaining_cards.values())[0]
+        remaining_cards[rank] -= 1
+        
+        available_suits = remaining_suits[rank]
+        suit = random.choices(available_suits.keys(), weights=available_suits.values())[0]
+        remaining_suits[suit] -= 1
+        
+    return {
+        "rank": rank,
+        "suit": suit,
+    }
+
+
+
+
 
 def start_game():
     pass
 
 
+## Settings functions ##
 def reset_settings():
     for setting in settings.values():
         setting["value"] = setting["default"]
@@ -125,8 +157,8 @@ def change_setting(setting: dict):
         
     elif type(setting["value"]) is int:
         if "min" in setting.keys():
-            _min = setting['min']
-            _max = setting['max']
+            _min = setting["min"]
+            _max = setting["max"]
             print(f"Enter an integer from {_min} to {_max} (inclusive)")
 
             new = get_int_range("New value: ", _min, _max)
@@ -182,9 +214,27 @@ def start_tutorial():
 def main():
     '''The main function that handles the primary input and logic of the game interface.'''
     
+    global ranks
+    
     # Add a 'value' key into each setting and set it as the default.
     for setting in settings.values():
         setting["value"] = setting["default"]
+    
+    # Add in all the ranks during runtime
+    ranks.append('A')
+    
+    for i in range(2, 11):
+        ranks.append(i)
+    
+    ranks += ['J', 'Q', 'K']
+    
+    while True:
+        hand = []
+        for i in range(0, random.randrange(1, 15)):
+            hand.append(draw_card())
+        
+        display.hand(hand)
+        input()
 
     display.intro()
     
