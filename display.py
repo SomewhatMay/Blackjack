@@ -11,6 +11,7 @@ suit_symbols = {
     'clubs': '♣',
 }
 
+
 def get_lines(drawings: [str]) -> [str]:
     result = []
     
@@ -36,6 +37,59 @@ def get_lines(drawings: [str]) -> [str]:
     return result
             
 
+def full_card(hidden: bool):
+    if hidden == True:
+        return """╔═══════════╗
+║?╔═══════╗?║
+║ ║       ║ ║
+║ ║       ║ ║
+║ ║       ║ ║
+║ ║       ║ ║
+║ ║       ║ ║
+║ ║       ║ ║
+║ ║       ║ ║
+║?╚═══════╝?║
+╚═══════════╝"""
+    else:
+        return """╔═══════════╗
+║         {:<2}║
+║         {} ║
+║           ║
+║  ╚═════╗  ║
+║  ║  {}  ║  ║
+║  ╚═════╗  ║
+║           ║
+║ {}         ║
+║{:>2}         ║
+╚═══════════╝"""
+
+
+def half_card(hidden: bool):
+    if hidden == True:
+        return """═══╗
+═╗?║
+ ║ ║
+ ║ ║
+ ║ ║
+ ║ ║
+ ║ ║
+ ║ ║
+ ║ ║
+═╝?║
+═══╝"""
+    else:
+        return """═══╗
+ {:<2}║
+ {} ║
+   ║
+╗  ║
+║  ║
+╗  ║
+   ║
+   ║
+   ║
+═══╝"""
+
 def hand(cards: [dict]):
     card_drawings = []
     
@@ -45,29 +99,11 @@ def hand(cards: [dict]):
         rank = card["rank"]
         
         if i == 0:
-            card_drawings.append(f"""╔═══════════╗
-║         {rank:<2}║
-║         {suit_symbol} ║
-║           ║
-║  ╚═════╗  ║
-║  ║  {suit_symbol}  ║  ║
-║  ╚═════╗  ║
-║           ║
-║ {suit_symbol}         ║
-║{rank:>2}         ║
-╚═══════════╝""")
+            drawing = full_card(card["hidden"])
         else:
-            card_drawings.append(f"""═══╗
- {rank:<2}║
- {suit_symbol} ║
-   ║
-╗  ║
-║  ║
-╗  ║
-   ║
-   ║
-   ║
-═══╝""")
+            drawing = half_card(card["hidden"])
+        
+        card_drawings.append(drawing.format(rank, suit_symbol, suit_symbol, rank ,suit_symbol))
     
     output_lines = get_lines(card_drawings)
     
@@ -88,8 +124,7 @@ def intro():
 def settings_menu(settings):
     '''Display the settings interface'''
 
-    print()
-    print("--------------- SETTINGS ---------------")
+    title("SETTINGS")
     
     counter = 0
     for setting in settings.values():
@@ -108,12 +143,16 @@ def await_continue(message: str = "[press enter to continue...]"):
 def menu():
     '''Display the menu information to the user.'''
     
-    print()
-    print("--------------- MENU ---------------")
+    title("MENU")
     print("1. Start game")
     print("2. Options")
     print("3. Tutorial")
     print("4. Exit")
+
+
+def title(label: str):
+    print()
+    print(f"--------------- {label} ---------------")
 
 
 def goodbye():

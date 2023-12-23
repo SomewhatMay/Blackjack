@@ -6,6 +6,7 @@ __author__ = "Umayeer Ahsan"
 
 import display
 import random
+import time
 
 
 ## Constants ##
@@ -61,7 +62,6 @@ settings = {
 }
 
 ranks: [str] = [] # HACK loaded during runtime - is this okay? Should they be loaded in main()?
-hands = []
 remaining_cards = {}
 remaining_suits = {} # HACK loaded during runtime as well...
 
@@ -106,7 +106,8 @@ def get_decision(message: str, choices: [str]):
 
 
 ## Main game functions ##
-def draw_card() -> dict:
+# HACK default nullable parameter
+def draw_card(hidden: bool=False) -> dict:
     '''Get a random card from the deck and return its information.'''
     
     if settings["true_random"]["value"] == True:
@@ -129,6 +130,7 @@ def draw_card() -> dict:
     return {
         "rank": rank,
         "suit": suit,
+        "hidden": hidden,
     }
 
 
@@ -142,7 +144,22 @@ def shuffle_deck():
 
 
 def start_game():
-    pass
+    display.title("GAME")
+    
+    shuffle_deck()
+    
+    print("Dealing cards...")
+    time.sleep(1)
+    
+    user_hands = []
+    dealer_hand = []
+    
+    user_hands.append([draw_card(), draw_card()])
+    dealer_hand.append([draw_card()])
+    
+    print("Dealer:")
+    display.hand()
+    
 
 
 ## Settings functions ##
@@ -250,6 +267,20 @@ def main():
             available_suits[suit] = 0
         
         remaining_suits[rank] = available_suits
+    
+    
+    while True:
+        hand = []
+        print("Drawing: ", end='')
+        
+        for i in range(0, random.randrange(1, 15)):
+            card = draw_card(random.choices([True, False])[0])
+            print( ("{}{}" if (card["hidden"] == False) else "({}{})").format(card["rank"], display.suit_symbols[card["suit"]]) , end='' )
+            hand.append(card)
+
+        print()
+        display.hand(hand)
+        input()
 
     display.intro()
     
