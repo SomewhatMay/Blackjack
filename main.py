@@ -34,7 +34,7 @@ settings = {
     },
     "true_random": {
         "default": False,
-        "display_name": "True random cards.",
+        "display_name": "True Random Cards.",
         "description": "Uses truely (pseudo) random cards instead of using a specific number of decks.\nUse this if you hate card counters.\nWhen true, the 'Deck Count' setting does nothing."
     },
     "deck_count": {
@@ -43,6 +43,17 @@ settings = {
         "max": 1,
         "min": 12,
         "description": "The number of decks to use when dealing. Each card has an equal weight in the deck.\nInput a number between 1 and 12 (inclusive)."
+    },
+    
+    # The following dictionaries are used for 
+    # display purposes and not true settings
+    "reset": {
+        "default": "",
+        "display_name": "Reset All Settings",
+    },
+    "return": {
+        "default": "",
+        "display_name": "Return to Menu",
     }
 }
 
@@ -62,16 +73,16 @@ def get_int_range(message: str, min_: int, max_: int) -> int:
     '''Prompt the user with message to enter an integer between min_ and max_ 
     to be returned.
     
-    The min_ is inclusive but the max_ is exclusive.
+    The min_ and max_ are both inclusive.
     '''
     
     while True:
         n = get_int(message)
         
-        if min_ <= n < max_:
+        if min_ <= n <= max_:
             return n
         else:
-            print(f"Input out of range. Try a value between {min_} (inclusive) and {max_} (exclusive)")
+            print(f"Input out of range. Try a value between {min_} and {max_} (both inclusive)")
 
 
 def get_decision(message: str, choices: [str]):
@@ -91,25 +102,78 @@ def start_game():
     pass
 
 
-def toggle_settings():
-    display.settings_menu(settings)
+def reset_settings():
+    for setting in settings.values():
+        setting["value"] = setting["default"]
     
-    choice = get_int_range("Select a setting: ", 1, len(settings) + 1)
-    # Find the setting in position choice
-    setting = list(settings.values())[choice]
-    print("Would you like to:\n  (c)hange the setting\n  (r)ead a description")
-    decision = get_decision("> ", ['c', 'r'])
-    
-    if decision == 'c':
-        print(f"Current Value: {setting['value']}")
-        
-        if type(setting["value"]) is bool:
-            print("Type 0 for False and 1 for True.")
-        elif type(setting["value"]) is int:
-            if "min" in setting.keys():
-                print(f"Enter a value from {setting['min']} to {setting['max']} (inclusive)")
-            
+    print("Reset all settings to default value.")
 
+
+def change_setting(setting: dict):
+    print(f"\nCurrent value: {setting['value']}")
+            
+    # Retrieve a new value depending on the type of setting.
+    if type(setting["value"]) is bool:
+        print("Type 0 for False and 1 for True.")
+        
+        new = get_int_range("New value: ", 0, 1)
+        
+        if new == 0:
+            new = False
+        else:
+            new = True
+        
+    elif type(setting["value"]) is int:
+        if "min" in setting.keys():
+            _min = setting['min']
+            _max = setting['max']
+            print(f"Enter an integer from {_min} to {_max} (inclusive)")
+
+            new = get_int_range("New value: ", _min, _max)
+        else:
+            print("Enter an integer")
+            
+            new = get_int("New value: ")
+
+    setting["value"] = new
+    print(f"Setting updated to: {new}")
+
+
+def toggle_settings():
+    while True:
+        display.settings_menu(settings)
+        
+        # Add two to upper bound since the last two 
+        # selections are for resetting all settings and returning to menu.
+        selection = get_int_range("Select a setting: ", 1, len(settings))
+        
+        # Second last option (reset settings).
+        if selection == len(settings) - 1:
+            reset_settings()
+            display.await_continue("[press enter to return to settings menu...]")
+            continue
+
+        # Last option (return to menu).
+        elif selection == len(settings):
+            return
+        
+        # Find the zero-indexed position of the selected setting.
+        setting = list(settings.values())[selection - 1]
+        
+        print("\nWould you like to:\n  (c)hange the setting\n  (r)ead the description\n  (g)o back")
+        decision = get_decision("> ", ['c', 'r', 'g'])
+       
+        if decision == 'c':
+            change_setting(setting)
+            
+        elif decision == 'r':
+            print(f"\n{setting['display_name']}:\n{setting['description']}")
+        
+        elif decision == 'g':
+            continue
+            
+        display.await_continue("[press enter to return to settings menu...]")
+           
 
 def start_tutorial():
     pass
@@ -118,7 +182,7 @@ def start_tutorial():
 def main():
     '''The main function that handles the primary input and logic of the game interface.'''
     
-    # Add a 'value' key into each setting and set it as the default
+    # Add a 'value' key into each setting and set it as the default.
     for setting in settings.values():
         setting["value"] = setting["default"]
 
@@ -126,7 +190,7 @@ def main():
     
     while True:
         display.menu()
-        decision = get_int_range("> ", 1, 5)
+        decision = get_int_range("> ", 1, 4)
         
         if decision == 1:
             start_game()
