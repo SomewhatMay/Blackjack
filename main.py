@@ -143,22 +143,85 @@ def shuffle_deck():
                 remaining_suits[rank][suit] = settings["deck_count"]["value"]
 
 
+def new_hand(bet: int, cards: list) -> dict:
+    return {
+        "bet": int,
+        "cards": cards,
+    }
+
+
 def start_game():
     display.title("GAME")
+
+    # TODO Add a wallet system
+    print("Enter an amount to bet: ")
+    initial_bet = get_int("> ")
     
     shuffle_deck()
     
     print("Dealing cards...")
     time.sleep(1)
     
+    # Since the user can have multiple hands by splitting,
+    # we will have a list that contains all of them
     user_hands = []
-    dealer_hand = []
     
-    user_hands.append([draw_card(), draw_card()])
-    dealer_hand.append([draw_card()])
+    user_hands.append(
+        new_hand(initial_bet, [draw_card(), draw_card()])
+    )
+    dealer_hand = [draw_card(), draw_card(True)]
     
-    print("Dealer:")
-    display.hand()
+    i = 0
+    while i < len(user_hands):
+        turn = 0
+        hand = user_hands[i]
+        
+        while True:
+            print("Dealer:")
+            display.hand(dealer_hand)
+
+            print("Your hand:")
+            display.hand(hand["cards"])
+            
+            decisions = "  (h)it\n  (s)tand\n"
+            choices = ['h', 's']
+            
+            if turn == 0:
+                if hand["cards"][0]["rank"] == hand[0]["cards"]["rank"] and settings["splitting"]["value"] == True:
+                    decision += "\n  (sp)lit hands"
+                    choices.append("sp")
+                
+                if settings["doubling"]["value"] == True:
+                    decision += "\n  (d)ouble down"
+                    choices.append('d')
+                    
+                    # TODO Check if the player has sufficient funds
+                
+                if settings["surrendering"]["value"] == True:
+                    decision += "\n  (f)orfeit"
+                    choices.append('f')
+            
+            print(f"Would you like to:\n{decision}")
+            decision = get_decision("> ", choices)
+            
+            if decision == 's':
+                break
+            elif decision == 'h':
+                hand["cards"].append(draw_card())
+                continue
+            elif decision == 'd':
+                # TODO take funds out of player's wallet
+                pass
+            elif decision == 'sp':
+                second_card = hand["cards"].pop()
+                hand["bet"] /= 2
+                user_hands.append(
+                    new_hand(hand["bet"], [second_card])
+                )
+                
+        i += 1
+                
+                
     
 
 
@@ -267,20 +330,6 @@ def main():
             available_suits[suit] = 0
         
         remaining_suits[rank] = available_suits
-    
-    
-    while True:
-        hand = []
-        print("Drawing: ", end='')
-        
-        for i in range(0, random.randrange(1, 15)):
-            card = draw_card(random.choices([True, False])[0])
-            print( ("{}{}" if (card["hidden"] == False) else "({}{})").format(card["rank"], display.suit_symbols[card["suit"]]) , end='' )
-            hand.append(card)
-
-        print()
-        display.hand(hand)
-        input()
 
     display.intro()
     

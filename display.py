@@ -21,7 +21,7 @@ def get_lines(drawings: [str]) -> [str]:
     while not COMPLETED:
         current_line = ""
         
-        for i in range(0, len(drawings)):
+        for i in range(len(drawings)):
             drawing = drawings[i]
             new_line_index = drawing.find('\n')
             
@@ -93,7 +93,7 @@ def half_card(hidden: bool):
 def hand(cards: [dict]):
     card_drawings = []
     
-    for i in range(0, len(cards)):
+    for i in range(len(cards)):
         card = cards[i]
         suit_symbol = suit_symbols[card["suit"]]
         rank = card["rank"]
