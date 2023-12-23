@@ -9,10 +9,12 @@ import random
 
 
 ## Constants ##
-
+SUITS = ["clubs", "diamonds", "spades", "hearts"] # HACK Making this list a constant since it will never be changed
 
 ## Global Variables ##
 settings = {
+    # Each settings dictionary will have an additional 'value' 
+    # property (a exact copy of their 'default' property) assigned to them during runtime
     "surrendering": {
         "default": False,
         "display_name": "Surrendering Enabled",
@@ -58,11 +60,10 @@ settings = {
     }
 }
 
-suits = ["clubs", "diamonds", "spades", "hearts"]
-ranks = [] # HACK loaded during runtime - is this okay?
+ranks: [str] = [] # HACK loaded during runtime - is this okay? Should they be loaded in main()?
 hands = []
 remaining_cards = {}
-remaining_suits = {}
+remaining_suits = {} # HACK loaded during runtime as well...
 
 def get_int(message: str) -> int:
     '''Prompt the user with message to enter an integer to be returned.'''
@@ -103,14 +104,19 @@ def get_decision(message: str, choices: [str]):
         else:
             print("Please choose a valid option. Try again.")
 
+
 ## Main game functions ##
 def draw_card() -> dict:
     '''Get a random card from the deck and return its information.'''
     
     if settings["true_random"]["value"] == True:
         rank = random.choice(ranks)
-        suit = random.choice(suits)
+        suit = random.choice(SUITS)
     else:
+        # Reshuffle the deck if there are no more cards left
+        if sum(remaining_cards.values()) == 0:
+            shuffle_deck()
+        
         # HACK random.choices; the hacky indexing;
         # FIXME might have to cast to list before this function works
         rank = random.choices(remaining_cards.keys(), weights=remaining_cards.values())[0]
@@ -126,7 +132,13 @@ def draw_card() -> dict:
     }
 
 
-
+def shuffle_deck():
+    if settings["true_random"]["value"] != True:
+        for rank in ranks:
+            remaining_cards[rank] = settings["deck_count"]["value"] * len(SUITS)
+            
+            for suit in SUITS:
+                remaining_suits[rank][suit] = settings["deck_count"]["value"]
 
 
 def start_game():
@@ -220,7 +232,7 @@ def main():
     for setting in settings.values():
         setting["value"] = setting["default"]
     
-    # Add in all the ranks during runtime
+    # Add the ranks
     ranks.append('A')
     
     for i in range(2, 11):
@@ -228,13 +240,16 @@ def main():
     
     ranks += ['J', 'Q', 'K']
     
-    while True:
-        hand = []
-        for i in range(0, random.randrange(1, 15)):
-            hand.append(draw_card())
+    # Add a key for each rank in remaining_suits, storing a dictionary
+    # of suits as keys and the corresponding remaining cards of that 
+    # rank and suit as values
+    for rank in ranks:
+        available_suits = {}
         
-        display.hand(hand)
-        input()
+        for suit in SUITS:
+            available_suits[suit] = 0
+        
+        remaining_suits[rank] = available_suits
 
     display.intro()
     

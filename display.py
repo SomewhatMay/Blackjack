@@ -36,7 +36,6 @@ def get_lines(drawings: [str]) -> [str]:
     return result
             
 
-
 def hand(cards: [dict]):
     card_drawings = []
     
