@@ -90,7 +90,8 @@ def half_card(hidden: bool):
    ║
 ═══╝"""
 
-def hand(cards: [dict]):
+
+def print_cards(cards: [dict]):
     card_drawings = []
     
     for i in range(len(cards)):
@@ -111,6 +112,14 @@ def hand(cards: [dict]):
         print(line)
     
     print()
+
+
+def print_hands(dealer_hand: [dict], user_hand: [dict], ratio: str):
+    print("Dealer's hand:")
+    print_cards(dealer_hand)
+
+    print(f"Your hand {ratio}:")
+    print_cards(user_hand)
 
 
 def intro():

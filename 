@@ -1,0 +1,47 @@
+[33mcommit 94e4f642e076b8f9f8c9c3c427c8a8d66dd69117[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: May <40745122+SomewhatMay@users.noreply.github.com>
+Date:   Sat Dec 23 15:41:47 2023 -0500
+
+    working on hand system
+
+[33mcommit a0dfe9dc8e36c685dda2139090f53461d78f02eb[m
+Author: May <40745122+SomewhatMay@users.noreply.github.com>
+Date:   Sat Dec 23 15:18:28 2023 -0500
+
+    hidden cards
+
+[33mcommit 4c1398e7a50fb9fa60fc005d97a68bff40d240dd[m
+Author: May <40745122+SomewhatMay@users.noreply.github.com>
+Date:   Sat Dec 23 14:25:17 2023 -0500
+
+    shuffle deck
+
+[33mcommit 90f4c9198b1a0b3196cb7738227f3f7f9160b377[m
+Author: May <40745122+SomewhatMay@users.noreply.github.com>
+Date:   Sat Dec 23 00:32:44 2023 -0500
+
+    Display hand capability
+
+[33mcommit fa847f1302923bbe9e578ab6f077fbfda2b31ed2[m
+Author: May <40745122+SomewhatMay@users.noreply.github.com>
+Date:   Fri Dec 22 20:36:45 2023 -0500
+
+    settings menu completed
+
+[33mcommit 850edb0c1fd59309e3c211524ce3100ae048a366[m
+Author: Ahsan <Umayeer.Ahsan@student.tdsb.on.ca>
+Date:   Thu Dec 21 15:14:09 2023 -0500
+
+    working on settings
+
+[33mcommit ba62961d495182d11ecb669c1691c2d8d4164aca[m
+Author: May <40745122+SomewhatMay@users.noreply.github.com>
+Date:   Thu Dec 21 11:37:40 2023 -0500
+
+    Added settings object
+
+[33mcommit c6310058886fee45aaeca1c0dee1e2c3354ca494[m
+Author: May <40745122+SomewhatMay@users.noreply.github.com>
+Date:   Thu Dec 21 00:04:27 2023 -0500
+
+    Initial commit + basic functions

@@ -145,9 +145,34 @@ def shuffle_deck():
 
 def new_hand(bet: int, cards: list) -> dict:
     return {
-        "bet": int,
+        "bet": bet,
         "cards": cards,
+        "is_split": False,
+        "double_bet": False,
     }
+
+
+def hit(hand: dict):
+    new_card = draw_card()
+    hand["cards"].insert(0, new_card)
+    
+    suit_symbol = display.suit_symbols[new_card["suit"]]
+    
+    print(f"You just drew a {new_card['rank']}{suit_symbol}.")
+    print()
+
+
+def split(hand, user_hands):
+    second_card = hand["cards"].pop()
+    hand["bet"] /= 2
+    hand["is_split"] = True
+
+    split_hand = new_hand(hand["bet"], [second_card])
+    split_hand["is_split"] = True
+    user_hands.append(split_hand)
+    
+    print("You have split your hands.")
+    print(f"You now have {len(user_hands)} hands.")
 
 
 def start_game():
@@ -169,7 +194,7 @@ def start_game():
     user_hands.append(
         new_hand(initial_bet, [draw_card(), draw_card()])
     )
-    dealer_hand = [draw_card(), draw_card(True)]
+    dealer_hand = new_hand(0, [draw_card(), draw_card(True)])
     
     i = 0
     while i < len(user_hands):
@@ -177,50 +202,75 @@ def start_game():
         hand = user_hands[i]
         
         while True:
-            print("Dealer:")
-            display.hand(dealer_hand)
+            turn += 1
+            
+            display.print_hands(dealer_hand["cards"], hand["cards"], f"{i+1}/{len(user_hands)}")
+            
+            if hand["is_split"] == True or hand["double_bet"] == True:
+                display.await_continue("[press enter to draw your final card...]")
+                    
+                hit(hand)
+                
+                display.print_hands(dealer_hand["cards"], hand["cards"], f"{i+1}/{len(user_hands)}")
+                
+                if hand["is_split"]:
+                    if hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
+                        print("Would you like to:\n  (sp)lit\n  (s)tand")
+                        decision = get_decision("> ", ['s', "sp"])
+                        
+                        if decision == "sp":
+                            split(hand, user_hands)
+                    else:
+                        display.await_continue("[press enter to complete this hand...]")
+                else:
+                    display.await_continue("[press enter to end your turn...]")
 
-            print("Your hand:")
-            display.hand(hand["cards"])
-            
-            decisions = "  (h)it\n  (s)tand\n"
-            choices = ['h', 's']
-            
-            if turn == 0:
-                if hand["cards"][0]["rank"] == hand[0]["cards"]["rank"] and settings["splitting"]["value"] == True:
-                    decision += "\n  (sp)lit hands"
+                break
+            else:
+                decisions = "  (h)it\n  (s)tand"
+                choices = ['h', 's']
+
+                if settings["splitting"]["value"] == True and hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
+                    decisions += "\n  (sp)lit hands"
                     choices.append("sp")
                 
-                if settings["doubling"]["value"] == True:
-                    decision += "\n  (d)ouble down"
-                    choices.append('d')
+                if turn == 1:
+                    if settings["doubling"]["value"] == True:
+                        decisions += "\n  (d)ouble down"
+                        choices.append('d')
+                        
+                        # TODO Check if the player has sufficient funds
                     
-                    # TODO Check if the player has sufficient funds
+                    if settings["surrendering"]["value"] == True:
+                        decisions += "\n  (f)orfeit"
+                        choices.append('f')
                 
-                if settings["surrendering"]["value"] == True:
-                    decision += "\n  (f)orfeit"
-                    choices.append('f')
-            
-            print(f"Would you like to:\n{decision}")
-            decision = get_decision("> ", choices)
-            
-            if decision == 's':
-                break
-            elif decision == 'h':
-                hand["cards"].append(draw_card())
-                continue
-            elif decision == 'd':
-                # TODO take funds out of player's wallet
-                pass
-            elif decision == 'sp':
-                second_card = hand["cards"].pop()
-                hand["bet"] /= 2
-                user_hands.append(
-                    new_hand(hand["bet"], [second_card])
-                )
+                print(f"Would you like to:\n{decisions}")
+                decision = get_decision("> ", choices)
+                
+                if decision == 's':
+                    print("You've chosen to stand.")
+                    break
+                elif decision == 'h':
+                    hit(hand)
+                    
+                    continue
+                elif decision == 'd':
+                    # TODO take funds out of player's wallet
+                    hand["bet"] *= 2
+                    hand["double_bet"] = True
+                    print(f"You've doubled your bet to a total bet of {hand['bet']}.")
+                    
+                    continue
+                    
+                elif decision == 'sp':
+                    split(hand, user_hands)
+                    
+                    continue
                 
         i += 1
-                
+        
+    display.title("Finished!")
                 
     
 
@@ -315,10 +365,10 @@ def main():
     # Add the ranks
     ranks.append('A')
     
-    for i in range(2, 11):
-        ranks.append(i)
+    # for i in range(2, 11):
+    #     ranks.append(i)
     
-    ranks += ['J', 'Q', 'K']
+    ranks += ['J',]# 'Q', 'K']
     
     # Add a key for each rank in remaining_suits, storing a dictionary
     # of suits as keys and the corresponding remaining cards of that 
