@@ -13,6 +13,8 @@ import time
 SUITS = ["clubs", "diamonds", "spades", "hearts"] # HACK Making this list a constant since it will never be changed
 
 ## Global Variables ##
+balance = 1000.00
+
 settings = {
     # Each settings dictionary will have an additional 'value' 
     # property (a exact copy of their 'default' property) assigned to them during runtime
@@ -89,7 +91,7 @@ def get_int_range(message: str, min_: int, max_: int) -> int:
         if min_ <= n <= max_:
             return n
         else:
-            print(f"Input out of range. Try a value between {min_} and {max_} (both inclusive)")
+            print(f"Input out of range. Try a value from {min_} to {max_} (both inclusive)")
 
 
 def get_decision(message: str, choices: [str]):
@@ -119,7 +121,6 @@ def draw_card(hidden: bool=False) -> dict:
             shuffle_deck()
         
         # HACK random.choices; the hacky indexing;
-        # FIXME might have to cast to list before this function works
         rank = random.choices(list(remaining_cards.keys()), weights=list(remaining_cards.values()))[0]
         remaining_cards[rank] -= 1
         
@@ -177,11 +178,17 @@ def split(hand, user_hands):
 
 
 def start_game():
+    global balance
+    
     display.title("GAME")
 
-    # TODO Add a wallet system
-    print("Enter an amount to bet: ")
-    initial_bet = get_int("> ")
+    # FIXME do something when the user has no more money
+    print(f"Balance: ${balance:.2f}")
+    print("Enter an integer dollar amount to bet: ")
+    initial_bet = get_int_range("> $", 1, balance)
+    balance -= initial_bet
+    print(f"Your bet: ${initial_bet}")
+    print()
     
     shuffle_deck()
     
@@ -205,14 +212,15 @@ def start_game():
         while True:
             turn += 1
             
-            display.print_hands(dealer_hand["cards"], hand["cards"], f"{i+1}/{len(user_hands)}")
+            hand_ratio = f"{i+1}/{len(user_hands)}"
+            display.print_hands(dealer_hand["cards"], hand, hand_ratio)
             
             if hand["is_split"] == True or hand["double_bet"] == True:
                 display.await_continue("[press enter to draw your final card...]")
                     
                 hit(hand)
                 
-                display.print_hands(dealer_hand["cards"], hand["cards"], f"{i+1}/{len(user_hands)}")
+                display.print_hands(dealer_hand["cards"], hand, hand_ratio)
                 
                 if hand["is_split"]:
                     if hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
@@ -231,17 +239,15 @@ def start_game():
             else:
                 decisions = "  (h)it\n  (s)tand"
                 choices = ['h', 's']
-
-                if settings["splitting"]["value"] == True and hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
-                    decisions += "\n  (sp)lit hands"
-                    choices.append("sp")
                 
                 if turn == 1:
-                    if settings["doubling"]["value"] == True:
+                    if settings["splitting"]["value"] == True and hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
+                        decisions += "\n  (sp)lit hands"
+                        choices.append("sp")
+                    
+                    if settings["doubling"]["value"] == True and (balance > initial_bet):
                         decisions += "\n  (d)ouble down"
                         choices.append('d')
-                        
-                        # TODO Check if the player has sufficient funds
                     
                     if settings["surrendering"]["value"] == True:
                         decisions += "\n  (f)orfeit"
@@ -258,10 +264,11 @@ def start_game():
                     
                     continue
                 elif decision == 'd':
-                    # TODO take funds out of player's wallet
+                    balance -= hand["bet"]
                     hand["bet"] *= 2
                     hand["double_bet"] = True
-                    print(f"You've doubled your bet to a total bet of {hand['bet']}.")
+                    print(f"You've doubled your bet to a total bet of ${hand['bet']:.2f}.")
+                    print(f"Your current balance: {balance:.2f}")
                     
                     continue
                     
@@ -385,15 +392,18 @@ def main():
     
     while True:
         display.menu()
-        decision = get_int_range("> ", 1, 4)
+        decision = get_int_range("> ", 1, 5)
         
         if decision == 1:
             start_game()
         elif decision == 2:
             toggle_settings()
         elif decision == 3:
-            start_tutorial()
+            # TODO Maybe add some other statistics if we have enough time?
+            print(f"Your balance is ${balance:.2f}")
         elif decision == 4:
+            start_tutorial()
+        elif decision == 5:
             display.goodbye()
             
             break

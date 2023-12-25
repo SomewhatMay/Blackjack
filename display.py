@@ -119,7 +119,8 @@ def print_hands(dealer_hand: [dict], user_hand: [dict], ratio: str):
     print_cards(dealer_hand)
 
     print(f"Your hand {ratio}:")
-    print_cards(user_hand)
+    print_cards(user_hand["cards"])
+    print(f"Your bet: {user_hand['bet']:.2f}")
 
 
 def intro():
@@ -155,8 +156,9 @@ def menu():
     title("MENU")
     print("1. Start game")
     print("2. Options")
-    print("3. Tutorial")
-    print("4. Exit")
+    print("3. View Balance")
+    print("4. Tutorial")
+    print("5. Exit")
 
 
 def title(label: str):
