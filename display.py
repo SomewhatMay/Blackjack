@@ -11,6 +11,53 @@ suit_symbols = {
     'clubs': '♣',
 }
 
+def hand_value(cards: [dict]) -> [int]:
+    has_ace = False
+    primary_value = 0
+
+    for card in cards:
+        if card["hidden"] == True:
+            continue
+        
+        rank = card["rank"]
+        
+        if rank == 'A':
+            if has_ace:
+                primary_value += 1
+            else:
+                has_ace = True
+        elif rank == 'J' or rank == 'Q' or rank == 'K':
+            primary_value += 10
+        else:
+            primary_value += rank
+    
+    values = [primary_value]
+    
+    if has_ace:
+        values[0] += 1
+        
+        # Only include the 'ace as an 11-value card' if it is below 21!
+        if primary_value + 11 < 21:
+            values.append(primary_value + 11)
+    
+    return values
+            
+
+def hand_state(hand: [dict]):
+    values = hand_value(hand["cards"])
+    
+    print("Hand Value: ", end='')
+    
+    if len(values) > 1 and values[1] == 21 and len(hand["cards"]) == 2:
+        print("BLACKJACK")
+    else:
+        for i in range(len(values)):
+            print(values[i], end='')
+            
+            if i != (len(values) - 1):
+                print(" / ", end='')
+        print()
+
 
 def get_lines(drawings: [str]) -> [str]:
     result = []
@@ -116,11 +163,14 @@ def print_cards(cards: [dict]):
 
 def print_hands(dealer_hand: [dict], user_hand: [dict], ratio: str):
     print("Dealer's hand:")
-    print_cards(dealer_hand)
+    print_cards(dealer_hand["cards"])
+    hand_state(dealer_hand)
 
     print(f"Your hand {ratio}:")
     print_cards(user_hand["cards"])
+    hand_state(user_hand)
     print(f"Your bet: {user_hand['bet']:.2f}")
+    print()
 
 
 def intro():

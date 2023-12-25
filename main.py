@@ -178,6 +178,7 @@ def split(hand, user_hands):
 
 
 def start_game():
+    # HACK Is this okay?
     global balance
     
     display.title("GAME")
@@ -213,14 +214,14 @@ def start_game():
             turn += 1
             
             hand_ratio = f"{i+1}/{len(user_hands)}"
-            display.print_hands(dealer_hand["cards"], hand, hand_ratio)
+            display.print_hands(dealer_hand, hand, hand_ratio)
             
             if hand["is_split"] == True or hand["double_bet"] == True:
                 display.await_continue("[press enter to draw your final card...]")
                     
                 hit(hand)
                 
-                display.print_hands(dealer_hand["cards"], hand, hand_ratio)
+                display.print_hands(dealer_hand, hand, hand_ratio)
                 
                 if hand["is_split"]:
                     if hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
