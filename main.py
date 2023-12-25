@@ -173,6 +173,7 @@ def split(hand, user_hands):
     
     print("You have split your hands.")
     print(f"You now have {len(user_hands)} hands.")
+    print()
 
 
 def start_game():
@@ -220,6 +221,7 @@ def start_game():
                         
                         if decision == "sp":
                             split(hand, user_hands)
+                            continue
                     else:
                         display.await_continue("[press enter to complete this hand...]")
                 else:
