@@ -37,7 +37,7 @@ settings = {
         "description": "When true, dealer must hit on a soft 17. Otherwise, the dealer stands."
     },
     "true_random": {
-        "default": True,
+        "default": False,
         "display_name": "True Random Cards.",
         "description": "Uses truely (pseudo) random cards instead of using a specific number of decks.\nUse this if you hate card counters.\nWhen true, the 'Deck Count' setting does nothing."
     },
@@ -120,12 +120,12 @@ def draw_card(hidden: bool=False) -> dict:
         
         # HACK random.choices; the hacky indexing;
         # FIXME might have to cast to list before this function works
-        rank = random.choices(remaining_cards.keys(), weights=remaining_cards.values())[0]
+        rank = random.choices(list(remaining_cards.keys()), weights=list(remaining_cards.values()))[0]
         remaining_cards[rank] -= 1
         
         available_suits = remaining_suits[rank]
-        suit = random.choices(available_suits.keys(), weights=available_suits.values())[0]
-        remaining_suits[suit] -= 1
+        suit = random.choices(list(available_suits.keys()), weights=list(available_suits.values()))[0]
+        available_suits[suit] -= 1
         
     return {
         "rank": rank,
@@ -273,9 +273,7 @@ def start_game():
         i += 1
         
     display.title("Finished!")
-                
     
-
 
 ## Settings functions ##
 def reset_settings():
@@ -367,10 +365,10 @@ def main():
     # Add the ranks
     ranks.append('A')
     
-    # for i in range(2, 11):
-    #     ranks.append(i)
+    for i in range(2, 11):
+        ranks.append(i)
     
-    ranks += ['J',]# 'Q', 'K']
+    ranks += ['J', 'Q', 'K']
     
     # Add a key for each rank in remaining_suits, storing a dictionary
     # of suits as keys and the corresponding remaining cards of that 
