@@ -99,7 +99,7 @@ def full_card(hidden: bool):
 ╚═══════════╝"""
     else:
         return """╔═══════════╗
-║         {:<2}║
+║        {:>2} ║
 ║         {} ║
 ║           ║
 ║  ╚═════╗  ║
@@ -107,7 +107,7 @@ def full_card(hidden: bool):
 ║  ╚═════╗  ║
 ║           ║
 ║ {}         ║
-║{:>2}         ║
+║ {:<2}        ║
 ╚═══════════╝"""
 
 
@@ -126,7 +126,7 @@ def half_card(hidden: bool):
 ═══╝"""
     else:
         return """═══╗
- {:<2}║
+{:>2} ║
  {} ║
    ║
 ╗  ║
@@ -151,7 +151,7 @@ def print_cards(cards: [dict]):
         else:
             drawing = half_card(card["hidden"])
         
-        card_drawings.append(drawing.format(rank, suit_symbol, suit_symbol, rank ,suit_symbol))
+        card_drawings.append(drawing.format(rank, suit_symbol, suit_symbol, suit_symbol, rank))
     
     output_lines = get_lines(card_drawings)
     
