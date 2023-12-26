@@ -43,20 +43,41 @@ def hand_value(cards: [dict]) -> [int]:
     return values
             
 
-def hand_state(hand: [dict]):
-    values = hand_value(hand["cards"])
+def hand_state(cards: [dict]) -> dict:
+    values = hand_value(cards)
     
-    print("Hand Value: ", end='')
+    if len(cards) == 2 and max(values) == 21:
+        state = "blackjack"
+    elif min(values) > 21:
+        state = "bust"
+    else:
+        state = "safe"
+
+    return {
+        "state": state,
+        "values": values,
+    }
+
+
+# QUESTION using nullable type in parameter?
+def graphical_hand_state(state_info: [dict], msg: str="Hand Value: "):
+    state = state_info["state"]
+    values = state_info["values"]
     
-    if len(values) > 1 and values[1] == 21 and len(hand["cards"]) == 2:
-        print("BLACKJACK")
+    state_display = msg
+    
+    if state == "blackjack":
+        state_display += "BLACKJACK"
+    elif state == "bust":
+        state_display += f"{values[0]} (BUST)"
     else:
         for i in range(len(values)):
-            print(values[i], end='')
+            state_display += str(values[i])
             
             if i != (len(values) - 1):
-                print(" / ", end='')
-        print()
+                state_display += " / "
+
+    return state_display
 
 
 def get_lines(drawings: [str]) -> [str]:
@@ -164,14 +185,46 @@ def print_cards(cards: [dict]):
 def print_hands(dealer_hand: [dict], user_hand: [dict], hand_count_ratio: str):
     print("Dealer's hand:")
     print_cards(dealer_hand["cards"])
-    hand_state(dealer_hand)
+    # QUESTION should I split up the nested function calls?
+    print(graphical_hand_state(hand_state(dealer_hand["cards"])))
+    print()
 
     print(f"Your hand {hand_count_ratio}:")
     print_cards(user_hand["cards"])
-    hand_state(user_hand)
-    print(f"Your bet: {user_hand['bet']:.2f}")
+    # QUESTION should I split up the nested function calls?
+    print(graphical_hand_state(hand_state(user_hand["cards"])))
+    print(f"Your bet: ${user_hand['bet']:.2f}")
     print()
 
+
+def print_hands_min(dealer_hand: [dict], user_hands: [dict]):
+    print("Dealer's hand:")
+    print_cards(dealer_hand["cards"])
+    # QUESTION should I split up the nested function calls?
+    dealer_state_info = hand_state(dealer_hand["cards"])
+    dealer_values = dealer_state_info["values"]
+    print(graphical_hand_state(dealer_state_info))
+    print()
+    
+    print("Your hands:")
+    for i in range(len(user_hands)):
+        hand = user_hands[i]
+        state_info = hand_state(hand["cards"])
+        user_values = state_info["values"]
+        output = graphical_hand_state(state_info, f"Hand {i+1}: ")
+        
+        if min(user_values) <= 21:
+            if max(user_values) == max(dealer_values):
+                output += " (PUSH)"
+            elif max(dealer_values) > 21:
+                output += " (WIN)"
+            elif max(user_values) < max(dealer_values):
+                output += " (LOSS)"
+        
+        output += f" - ${hand['bet']}"
+        
+        print("  " + output)
+        
 
 def intro():
     '''Display the introduction of the game which 

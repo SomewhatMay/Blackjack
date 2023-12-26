@@ -159,7 +159,7 @@ def hit(hand: dict):
     
     suit_symbol = display.suit_symbols[new_card["suit"]]
     
-    print(f"You just drew a {new_card['rank']}{suit_symbol}.")
+    print(f"Drew a {new_card['rank']}{suit_symbol}.")
     print()
 
 
@@ -177,15 +177,17 @@ def split(hand, user_hands):
     print()
 
 
-def play_user(user_hands, dealer_hand, initial_bet) -> bool:
+def play_user(user_hands, dealer_hand, initial_bet) -> dict:
     # QUESTION another global keyword usage... is this okay?
     global balance
     
     # Use a while loop since the length of hands can change
     # during the game from splitting
     forfeited = False
+    busted = False
+    doubled = False
     i = 0
-    while (not forfeited) and i < len(user_hands):
+    while (not forfeited) and (not busted) and i < len(user_hands):
         hand_complete = False
         turn = 0
         hand = user_hands[i]
@@ -251,6 +253,7 @@ def play_user(user_hands, dealer_hand, initial_bet) -> bool:
                     balance -= hand["bet"]
                     hand["bet"] *= 2
                     hand["double_bet"] = True
+                    doubled = True
                     print(f"You've doubled your bet to a total bet of ${hand['bet']:.2f}.")
                     print(f"Your current balance: {balance:.2f}")
                     
@@ -264,13 +267,37 @@ def play_user(user_hands, dealer_hand, initial_bet) -> bool:
                     hand_complete = True
                     forfeited = True
                 
+            if min(display.hand_value(hand["cards"])) > 21:
+                print("You have busted!")
+                busted = True
+                hand_complete = True
+                
         i += 1
 
-    return forfeited
+    return {
+        "forfeited": forfeited,
+        "busted": busted,
+        "doubled": doubled,
+    }
 
 
-def play_dealer(dealer_hand):
-    pass
+def reveal_hidden_card(dealer_hand):
+    second_card = dealer_hand["cards"][1]
+    second_card["hidden"] = False
+    suit_symbol = display.suit_symbols[second_card["suit"]]
+    
+    print()
+    print(f"The dealer's hidden card was a {second_card['rank']}{suit_symbol}!")
+
+
+def play_dealer(dealer_hand, user_hands):
+    reveal_hidden_card(dealer_hand)
+    display.print_hands_min(dealer_hand, user_hands)
+
+    while min(display.hand_value(dealer_hand["cards"])) < 17:
+        display.await_continue()
+        hit(dealer_hand)
+        display.print_hands_min(dealer_hand, user_hands)
 
 
 def start_game():
@@ -283,6 +310,7 @@ def start_game():
     print(f"Balance: ${balance:.2f}")
     print("Enter an integer dollar amount to bet: ")
     initial_bet = get_int_range("> $", 1, balance)
+    total_bet = initial_bet
     balance -= initial_bet
     print(f"Your bet: ${initial_bet}")
     print()
@@ -301,15 +329,52 @@ def start_game():
     )
     dealer_hand = new_hand(0, [draw_card(), draw_card(True)])
     
-    forfeited = play_user(user_hands, dealer_hand, initial_bet)
+    user_result = play_user(user_hands, dealer_hand, initial_bet)
+    print()
     
-    if not forfeited:
-        final_values = display.hand_value(user_hands["cards"])
+    if user_result["doubled"]:
+        total_bet *= 2
+    
+    if user_result["busted"] or user_result["forfeited"]:
+        reveal_hidden_card(dealer_hand)
         
-        play_dealer(dealer_hand)
+        # If you have split, you can not bust or forfeit. Therefore, there 
+        # is only one hand in the user_hands list
+        print("Final hands:")
+        primary_hand = user_hands[0]
+        display.print_hands(dealer_hand, primary_hand, "1/1")
+     
+        print("Game Over.")
+        print(f"Lost bet: {total_bet}")
+    else:
+        print("Your turn is complete. Dealer will deal now.")
+        display.await_continue()
+        
+        play_dealer(dealer_hand, user_hands)
+        dealer_values = display.hand_value(dealer_hand["cards"])
+        
+        profit = 0
+        for hand in user_hands:
+            user_values = display.hand_value(hand["cards"])
+            
+            if min(user_values) <= 21:
+                if max(user_values) == max(dealer_values):
+                    profit += hand["bet"]
+                elif max(dealer_values) > 21:
+                    profit += (hand["bet"] * 2)
+        
+        total_outcome = profit - total_bet
+        
+        balance += profit
+        
+        print()
+        print("Results:")
+        print(f"  Profit: {profit}")
+        print(f"  Total bet: -${total_bet}")
+        print(f"  Total: {total_outcome}")
     
-    display.title("Finished!")
-    
+    display.title("GAME OVER")
+    print()
 
 ## Settings functions ##
 def reset_settings():
