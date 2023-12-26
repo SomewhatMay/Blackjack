@@ -161,12 +161,12 @@ def print_cards(cards: [dict]):
     print()
 
 
-def print_hands(dealer_hand: [dict], user_hand: [dict], ratio: str):
+def print_hands(dealer_hand: [dict], user_hand: [dict], hand_count_ratio: str):
     print("Dealer's hand:")
     print_cards(dealer_hand["cards"])
     hand_state(dealer_hand)
 
-    print(f"Your hand {ratio}:")
+    print(f"Your hand {hand_count_ratio}:")
     print_cards(user_hand["cards"])
     hand_state(user_hand)
     print(f"Your bet: {user_hand['bet']:.2f}")
@@ -192,7 +192,7 @@ def settings_menu(settings):
         print(f"{counter}. {(setting['display_name']):<30}{setting['value']}")
 
 
-# HACK nullable/default parameter
+# QUESTION nullable/default parameter
 def await_continue(message: str = "[press enter to continue...]"):
     '''Waits for the user to want to continue by asking for an empty input.'''
     

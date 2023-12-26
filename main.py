@@ -10,7 +10,7 @@ import time
 
 
 ## Constants ##
-SUITS = ["clubs", "diamonds", "spades", "hearts"] # HACK Making this list a constant since it will never be changed
+SUITS = ["clubs", "diamonds", "spades", "hearts"] # QUESTION Making this list a constant since it will never be changed
 
 ## Global Variables ##
 balance = 1000.00
@@ -63,9 +63,9 @@ settings = {
     }
 }
 
-ranks: [str] = [] # HACK loaded during runtime - is this okay? Should they be loaded in main()?
+ranks: [str] = [] # QUESTION loaded during runtime - is this okay? Should they be loaded in main()?
 remaining_cards = {}
-remaining_suits = {} # HACK loaded during runtime as well...
+remaining_suits = {} # QUESTION loaded during runtime as well...
 
 def get_int(message: str) -> int:
     '''Prompt the user with message to enter an integer to be returned.'''
@@ -107,8 +107,17 @@ def get_decision(message: str, choices: [str]):
             print("Please choose a valid option. Try again.")
 
 
+def shuffle_deck():
+    if settings["true_random"]["value"] != True:
+        for rank in ranks:
+            remaining_cards[rank] = settings["deck_count"]["value"] * len(SUITS)
+            
+            for suit in SUITS:
+                remaining_suits[rank][suit] = settings["deck_count"]["value"]
+
+
 ## Main game functions ##
-# HACK default nullable parameter
+# QUESTION default nullable parameter
 def draw_card(hidden: bool=False) -> dict:
     '''Get a random card from the deck and return its information.'''
     
@@ -120,7 +129,7 @@ def draw_card(hidden: bool=False) -> dict:
         if sum(remaining_cards.values()) == 0:
             shuffle_deck()
         
-        # HACK random.choices; the hacky indexing;
+        # QUESTION random.choices; the hacky indexing;
         rank = random.choices(list(remaining_cards.keys()), weights=list(remaining_cards.values()))[0]
         remaining_cards[rank] -= 1
         
@@ -133,15 +142,6 @@ def draw_card(hidden: bool=False) -> dict:
         "suit": suit,
         "hidden": hidden,
     }
-
-
-def shuffle_deck():
-    if settings["true_random"]["value"] != True:
-        for rank in ranks:
-            remaining_cards[rank] = settings["deck_count"]["value"] * len(SUITS)
-            
-            for suit in SUITS:
-                remaining_suits[rank][suit] = settings["deck_count"]["value"]
 
 
 def new_hand(bet: int, cards: list) -> dict:
@@ -177,8 +177,104 @@ def split(hand, user_hands):
     print()
 
 
+def play_user(user_hands, dealer_hand, initial_bet) -> bool:
+    # QUESTION another global keyword usage... is this okay?
+    global balance
+    
+    # Use a while loop since the length of hands can change
+    # during the game from splitting
+    forfeited = False
+    i = 0
+    while (not forfeited) and i < len(user_hands):
+        hand_complete = False
+        turn = 0
+        hand = user_hands[i]
+        
+        while (not hand_complete) and (not forfeited):
+            turn += 1
+            
+            hand_count_ratio = f"{i+1}/{len(user_hands)}"
+            display.print_hands(dealer_hand, hand, hand_count_ratio)
+            
+            if hand["is_split"] == True or hand["double_bet"] == True:
+                display.await_continue("[press enter to draw your final card...]")
+                    
+                hit(hand)
+                
+                display.print_hands(dealer_hand, hand, hand_count_ratio)
+                
+                if hand["is_split"]:
+                    if hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
+                        print("Would you like to:\n  (sp)lit\n  (s)tand")
+                        decision = get_decision("> ", ['s', "sp"])
+                        
+                        if decision == "sp":
+                            split(hand, user_hands)
+
+                            # If we split again this hand into two again, the hand is still not 
+                            # complete since it needs at least two cards to be complete
+                            continue
+                    else:
+                        display.await_continue("[press enter to complete this hand...]")
+                else:
+                    display.await_continue("[press enter to end your turn...]")
+
+                hand_complete = True
+            else:
+                decisions = "  (h)it\n  (s)tand"
+                choices = ['h', 's']
+                
+                if turn == 1:
+                    if settings["splitting"]["value"] == True and hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
+                        decisions += "\n  (sp)lit hands"
+                        choices.append("sp")
+                    
+                    if settings["doubling"]["value"] == True and (balance > initial_bet):
+                        decisions += "\n  (d)ouble down"
+                        choices.append('d')
+                    
+                    if settings["surrendering"]["value"] == True:
+                        decisions += "\n  (f)orfeit"
+                        choices.append('f')
+                
+                print(f"Would you like to:\n{decisions}")
+                decision = get_decision("> ", choices)
+                
+                if decision == 's':
+                    print("You've chosen to stand.")
+                    hand_complete = True
+
+                elif decision == 'h':
+                    hit(hand)
+                    
+                elif decision == 'd':
+                    balance -= hand["bet"]
+                    hand["bet"] *= 2
+                    hand["double_bet"] = True
+                    print(f"You've doubled your bet to a total bet of ${hand['bet']:.2f}.")
+                    print(f"Your current balance: {balance:.2f}")
+                    
+                elif decision == 'sp':
+                    split(hand, user_hands)
+                
+                elif decision == 'f':
+                    print(f"You've forfeited and have been returned ${initial_bet / 2} (half of your initial bet).")
+                    balance += initial_bet / 2
+
+                    hand_complete = True
+                    forfeited = True
+                
+        i += 1
+
+    return forfeited
+
+
+def play_dealer(dealer_hand):
+    pass
+
+
 def start_game():
-    # HACK Is this okay?
+    # QUESTION Is this okay?
     global balance
     
     display.title("GAME")
@@ -205,81 +301,13 @@ def start_game():
     )
     dealer_hand = new_hand(0, [draw_card(), draw_card(True)])
     
-    i = 0
-    while i < len(user_hands):
-        turn = 0
-        hand = user_hands[i]
+    forfeited = play_user(user_hands, dealer_hand, initial_bet)
+    
+    if not forfeited:
+        final_values = display.hand_value(user_hands["cards"])
         
-        while True:
-            turn += 1
-            
-            hand_ratio = f"{i+1}/{len(user_hands)}"
-            display.print_hands(dealer_hand, hand, hand_ratio)
-            
-            if hand["is_split"] == True or hand["double_bet"] == True:
-                display.await_continue("[press enter to draw your final card...]")
-                    
-                hit(hand)
-                
-                display.print_hands(dealer_hand, hand, hand_ratio)
-                
-                if hand["is_split"]:
-                    if hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
-                        print("Would you like to:\n  (sp)lit\n  (s)tand")
-                        decision = get_decision("> ", ['s', "sp"])
-                        
-                        if decision == "sp":
-                            split(hand, user_hands)
-                            continue
-                    else:
-                        display.await_continue("[press enter to complete this hand...]")
-                else:
-                    display.await_continue("[press enter to end your turn...]")
-
-                break
-            else:
-                decisions = "  (h)it\n  (s)tand"
-                choices = ['h', 's']
-                
-                if turn == 1:
-                    if settings["splitting"]["value"] == True and hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
-                        decisions += "\n  (sp)lit hands"
-                        choices.append("sp")
-                    
-                    if settings["doubling"]["value"] == True and (balance > initial_bet):
-                        decisions += "\n  (d)ouble down"
-                        choices.append('d')
-                    
-                    if settings["surrendering"]["value"] == True:
-                        decisions += "\n  (f)orfeit"
-                        choices.append('f')
-                
-                print(f"Would you like to:\n{decisions}")
-                decision = get_decision("> ", choices)
-                
-                if decision == 's':
-                    print("You've chosen to stand.")
-                    break
-                elif decision == 'h':
-                    hit(hand)
-                    
-                    continue
-                elif decision == 'd':
-                    balance -= hand["bet"]
-                    hand["bet"] *= 2
-                    hand["double_bet"] = True
-                    print(f"You've doubled your bet to a total bet of ${hand['bet']:.2f}.")
-                    print(f"Your current balance: {balance:.2f}")
-                    
-                    continue
-                    
-                elif decision == 'sp':
-                    split(hand, user_hands)
-                    
-                    continue
-                
-        i += 1
-        
+        play_dealer(dealer_hand)
+    
     display.title("Finished!")
     
 
