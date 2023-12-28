@@ -117,11 +117,31 @@ def shuffle_deck():
 
 
 ## Main game functions ##
+
+#########################
+## DEPLOY remove this before deploying!
+mock_deck = ""
+#########################
+
 # QUESTION default nullable parameter
 def draw_card(hidden: bool=False) -> dict:
     '''Get a random card from the deck and return its information.'''
     
-    if settings["true_random"]["value"] == True:
+    #########################
+    ## DEPLOY remove this before deploying!
+    global mock_deck
+    
+    if mock_deck != "":
+        rank = mock_deck[0]
+        
+        if rank != "K" and rank != "Q" and rank != "J" and rank != "A":
+            rank = int(rank)
+        
+        suit = random.choice(SUITS)
+        mock_deck = mock_deck[1:]
+    #########################
+    
+    elif settings["true_random"]["value"] == True:
         rank = random.choice(ranks)
         suit = random.choice(SUITS)
     else:
@@ -292,12 +312,12 @@ def reveal_hidden_card(dealer_hand):
 
 def play_dealer(dealer_hand, user_hands):
     reveal_hidden_card(dealer_hand)
-    display.print_hands_min(dealer_hand, user_hands)
+    display.print_hands_all(dealer_hand, user_hands)
 
     while min(display.hand_value(dealer_hand["cards"])) < 17:
         display.await_continue()
         hit(dealer_hand)
-        display.print_hands_min(dealer_hand, user_hands)
+        display.print_hands_all(dealer_hand, user_hands)
 
 
 def start_game():
@@ -309,7 +329,7 @@ def start_game():
     # FIXME do something when the user has no more money
     print(f"Balance: ${balance:.2f}")
     print("Enter an integer dollar amount to bet: ")
-    initial_bet = get_int_range("> $", 1, balance)
+    initial_bet = get_int_range("> $", 1, balance) * 1.0
     total_bet = initial_bet
     balance -= initial_bet
     print(f"Your bet: ${initial_bet}")
@@ -338,11 +358,8 @@ def start_game():
     if user_result["busted"] or user_result["forfeited"]:
         reveal_hidden_card(dealer_hand)
         
-        # If you have split, you can not bust or forfeit. Therefore, there 
-        # is only one hand in the user_hands list
         print("Final hands:")
-        primary_hand = user_hands[0]
-        display.print_hands(dealer_hand, primary_hand, "1/1")
+        display.print_hands_all(dealer_hand, user_hands)
      
         print("Game Over.")
         print(f"Lost bet: {total_bet}")
@@ -360,7 +377,7 @@ def start_game():
             if min(user_values) <= 21:
                 if max(user_values) == max(dealer_values):
                     profit += hand["bet"]
-                elif max(dealer_values) > 21:
+                elif max(dealer_values) > 21 or max(user_values) > max(dealer_values):
                     profit += (hand["bet"] * 2)
         
         total_outcome = profit - total_bet
@@ -369,9 +386,9 @@ def start_game():
         
         print()
         print("Results:")
-        print(f"  Profit: {profit}")
-        print(f"  Total bet: -${total_bet}")
-        print(f"  Total: {total_outcome}")
+        print(f"  Return: {profit:.2f}")
+        print(f"  Total bet: -${total_bet:.2f}")
+        print(f"  Total earnings: {total_outcome:.2f}")
     
     display.title("GAME OVER")
     print()

@@ -59,8 +59,47 @@ def hand_state(cards: [dict]) -> dict:
     }
 
 
+# QUESTION nullable parameter?
+def graphical_hand_state(primary_hand: dict, secondary_hand: dict=None) -> str:
+    primary_state_info = hand_state(primary_hand["cards"])
+    primary_state = primary_state_info["state"]
+    primary_values = primary_state_info["values"]
+    
+    state_display = ""
+    
+    if primary_state == "blackjack":
+        state_display += "BLACKJACK"
+    elif primary_state == "bust":
+        state_display += f"{primary_values[0]} (BUST)"
+    else:
+        for i in range(len(primary_values)):
+            state_display += str(primary_values[i])
+            
+            if i != (len(primary_values) - 1):
+                state_display += " / "
+    
+    if secondary_hand != None:
+        secondary_state_info = hand_state(secondary_hand["cards"])
+        secondary_values = max(secondary_state_info["values"])
+        
+        if min(primary_values) <= 21:
+            if max(primary_values) == secondary_values:
+                state_display += " (PUSH)"
+            elif secondary_values > 21 or max(primary_values) > secondary_values:
+                state_display += " (WIN)"
+            elif max(primary_values) < secondary_values:
+                state_display += " (LOSS)"
+                
+        
+    if primary_hand["bet"] > 0:
+        state_display += f" - ${primary_hand['bet']}"
+
+    return state_display
+    
+
+
 # QUESTION using nullable type in parameter?
-def graphical_hand_state(state_info: [dict], msg: str="Hand Value: "):
+def __graphical_hand_state(state_info: [dict], msg: str="Hand Value: "):
     state = state_info["state"]
     values = state_info["values"]
     
@@ -182,29 +221,54 @@ def print_cards(cards: [dict]):
     print()
 
 
-def print_hands(dealer_hand: [dict], user_hand: [dict], hand_count_ratio: str):
+def print_dealer_hand(dealer_hand: dict):
     print("Dealer's hand:")
     print_cards(dealer_hand["cards"])
     # QUESTION should I split up the nested function calls?
-    print(graphical_hand_state(hand_state(dealer_hand["cards"])))
+    print(graphical_hand_state(dealer_hand))
     print()
 
-    print(f"Your hand {hand_count_ratio}:")
+
+# QUESTION nullable parameter?
+def print_user_hand(user_hand: dict, dealer_hand: dict, hand_count_ratio: str=None):
+    hand_count_output = "Your hand"
+    
+    if hand_count_ratio != None:
+        hand_count_output += " " + hand_count_ratio
+    
+    print(hand_count_output + ":")
+    
     print_cards(user_hand["cards"])
     # QUESTION should I split up the nested function calls?
-    print(graphical_hand_state(hand_state(user_hand["cards"])))
-    print(f"Your bet: ${user_hand['bet']:.2f}")
+    print(graphical_hand_state(user_hand, dealer_hand))
     print()
 
 
-def print_hands_min(dealer_hand: [dict], user_hands: [dict]):
-    print("Dealer's hand:")
-    print_cards(dealer_hand["cards"])
-    # QUESTION should I split up the nested function calls?
-    dealer_state_info = hand_state(dealer_hand["cards"])
-    dealer_values = dealer_state_info["values"]
-    print(graphical_hand_state(dealer_state_info))
-    print()
+# QUESTION nullable parameter?
+def print_hands(dealer_hand: dict, user_hand: [dict], hand_count_ratio: str=None):
+    print_dealer_hand(dealer_hand)
+    print_user_hand(user_hand, dealer_hand, hand_count_ratio)
+
+
+def print_hands_all(dealer_hand: dict, user_hands: [dict]):
+    print_dealer_hand(dealer_hand)
+    
+    if len(user_hands) > 1:
+        # Use minimal layout
+        for i in range(len(user_hands)):
+            hand = user_hands[i]
+            graphical_state = graphical_hand_state(hand, dealer_hand)
+            print(f"  Hand #{i+1}: {graphical_state}")
+    else:
+        # Use standard layout
+        print_user_hand(user_hands[0], dealer_hand)
+
+
+def __print_hands_min(dealer_hand: dict, user_hands: [dict]):
+    print_dealer_hand(dealer_hand)
+    
+    # QUESTION should I split these up into multiple variables?
+    dealer_values = hand_state(dealer_hand["cards"])["values"]
     
     print("Your hands:")
     for i in range(len(user_hands)):
