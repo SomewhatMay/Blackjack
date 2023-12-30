@@ -4,6 +4,9 @@
 __author__ = "Umayeer Ahsan"
 
 
+import time
+
+
 suit_symbols = {
     'spades': '♠',
     'hearts': '♥',
@@ -95,7 +98,6 @@ def graphical_hand_state(primary_hand: dict, secondary_hand: dict=None) -> str:
         state_display += f" - ${primary_hand['bet']}"
 
     return state_display
-    
 
 
 # QUESTION using nullable type in parameter?
@@ -315,6 +317,12 @@ def await_continue(message: str = "[press enter to continue...]"):
     
     print()
     input(message)
+
+
+# QUESTION nullable/default paramter?
+def print_yield(message: str="", duration: int=.5):
+    print(message)
+    time.sleep(duration)
 
 
 def menu():

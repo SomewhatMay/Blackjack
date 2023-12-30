@@ -320,6 +320,60 @@ def play_dealer(dealer_hand, user_hands):
         display.print_hands_all(dealer_hand, user_hands)
 
 
+def tutorial():
+    display.print_yield("Welcome to BLACKJACK!")
+
+    print("Game:")
+    display.print_yield("  Here is how to play:")
+    display.print_yield("  You bet a specific amount before the game begins.")
+    display.print_yield("  The objective of the game is simple: get as close to a hand value of 21 as possible WITHOUT going over.")
+    display.print_yield("  If you go over, you 'bust', meaning you lose!")
+    display.print_yield("  You are playing against the dearler, who has the same objective.")
+    display.print_yield("  If the dealer goes over 21, you win!")
+    
+    print("\nYou:")
+    display.await_continue("  What happens if neither of us go over 21? [press enter to continue...]")
+
+    print("\nGame:")
+    display.print_yield("  Glad you asked!")
+    display.print_yield("  The player that has a closer hand value to 21 wins!")
+
+    print("You:")
+    display.await_continue("  Wow! I'm so excited to play! What are the controls of the game? [press enter to continue...]")
+
+    print("\nGame:")
+    display.print_yield("  There are two primary controls:")
+    display.print_yield("    (h)it - You choose to pick up a new card.")
+    display.print_yield("      You can choose to hit for as long as you wish or until you go over 21.")
+    display.print_yield()
+    display.print_yield("    (s)tand - You choose to end your turn.")
+    display.print_yield("      Now the dealer will reveal their card and deal for themself.")
+    display.print_yield("  Assuming you havent busted, once the dealer completes dealing for themself, you have results of the game!")
+    display.print_yield("  If you win, you get twice what you bet. If you lose, you lose everything you bet.")
+    
+    print("\nYou:")
+    display.await_continue("  Nice! Seems intuitive. Are there any other things I should be aware of? [press enter to continue...]")
+
+    print("\nGame:")
+    display.print_yield("  Yes, there are two more controls that are only available at specific circumstances:")
+    display.print_yield("    (d)ouble - Double your bet (therefore doubling your return if you win).")
+    display.print_yield("      You can only draw one more card; this will be your final card.")
+    display.print_yield("      Only available on the first turn.")
+    display.print_yield()
+    display.print_yield("    (sp)lit - Split your hand into two separate hands.")
+    display.print_yield("      Your bet will be split evenly between both hands.")
+    display.print_yield("      You can only draw one more card per hand before that hand is complete.")
+    display.print_yield("      Only available when you have only two cards and they are of the same *rank* (not same value).")
+
+    print("\nYou:")
+    display.await_continue("  Great! Let's start the game! [press enter to start a game...]")
+
+    print("Game:")
+    display.print_yield("  Great! Let's begin.")
+
+    start_game()
+
+
 def start_game():
     # QUESTION Is this okay?
     global balance
@@ -337,8 +391,7 @@ def start_game():
     
     shuffle_deck()
     
-    print("Dealing cards...")
-    time.sleep(1)
+    display.print_yield("Dealing cards...", 1)
     
     # Since the user can have multiple hands by splitting,
     # we will have a list that contains all of them
@@ -465,10 +518,6 @@ def toggle_settings():
             continue
             
         display.await_continue("[press enter to return to settings menu...]")
-           
-
-def start_tutorial():
-    pass
 
 
 def main():
@@ -511,9 +560,9 @@ def main():
             toggle_settings()
         elif decision == 3:
             # TODO Maybe add some other statistics if we have enough time?
-            print(f"Your balance is ${balance:.2f}")
+            print(f"\nYour balance is ${balance:.2f}")
         elif decision == 4:
-            start_tutorial()
+            tutorial()
         elif decision == 5:
             display.goodbye()
             
