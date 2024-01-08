@@ -446,6 +446,7 @@ def start_game():
     display.title("GAME OVER")
     print()
 
+
 ## Settings functions ##
 def reset_settings():
     for setting in settings.values():

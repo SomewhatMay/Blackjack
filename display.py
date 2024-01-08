@@ -14,6 +14,7 @@ suit_symbols = {
     'clubs': '♣',
 }
 
+
 def hand_value(cards: [dict]) -> [int]:
     has_ace = False
     primary_value = 0
@@ -100,32 +101,10 @@ def graphical_hand_state(primary_hand: dict, secondary_hand: dict=None) -> str:
     return state_display
 
 
-# QUESTION using nullable type in parameter?
-def __graphical_hand_state(state_info: [dict], msg: str="Hand Value: "):
-    state = state_info["state"]
-    values = state_info["values"]
-    
-    state_display = msg
-    
-    if state == "blackjack":
-        state_display += "BLACKJACK"
-    elif state == "bust":
-        state_display += f"{values[0]} (BUST)"
-    else:
-        for i in range(len(values)):
-            state_display += str(values[i])
-            
-            if i != (len(values) - 1):
-                state_display += " / "
-
-    return state_display
-
-
 def get_lines(drawings: [str]) -> [str]:
     result = []
     
     COMPLETED = False
-    start = 0
     
     while not COMPLETED:
         current_line = ""
@@ -144,7 +123,7 @@ def get_lines(drawings: [str]) -> [str]:
         result.append(current_line)
 
     return result
-            
+
 
 def full_card(hidden: bool):
     if hidden == True:
@@ -265,32 +244,6 @@ def print_hands_all(dealer_hand: dict, user_hands: [dict]):
         # Use standard layout
         print_user_hand(user_hands[0], dealer_hand)
 
-
-def __print_hands_min(dealer_hand: dict, user_hands: [dict]):
-    print_dealer_hand(dealer_hand)
-    
-    # QUESTION should I split these up into multiple variables?
-    dealer_values = hand_state(dealer_hand["cards"])["values"]
-    
-    print("Your hands:")
-    for i in range(len(user_hands)):
-        hand = user_hands[i]
-        state_info = hand_state(hand["cards"])
-        user_values = state_info["values"]
-        output = graphical_hand_state(state_info, f"Hand {i+1}: ")
-        
-        if min(user_values) <= 21:
-            if max(user_values) == max(dealer_values):
-                output += " (PUSH)"
-            elif max(dealer_values) > 21:
-                output += " (WIN)"
-            elif max(user_values) < max(dealer_values):
-                output += " (LOSS)"
-        
-        output += f" - ${hand['bet']}"
-        
-        print("  " + output)
-        
 
 def intro():
     '''Display the introduction of the game which 
