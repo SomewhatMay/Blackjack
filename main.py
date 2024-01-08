@@ -67,6 +67,7 @@ ranks: [str] = [] # QUESTION loaded during runtime - is this okay? Should they b
 remaining_cards = {}
 remaining_suits = {} # QUESTION loaded during runtime as well...
 
+
 def get_int(message: str) -> int:
     '''Prompt the user with message to enter an integer to be returned.'''
     
@@ -445,6 +446,7 @@ def start_game():
     
     display.title("GAME OVER")
     print()
+
 
 ## Settings functions ##
 def reset_settings():

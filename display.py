@@ -14,7 +14,27 @@ suit_symbols = {
     'clubs': '♣',
 }
 
+
 def hand_value(cards: [dict]) -> [int]:
+    '''Using only the visible cards in cards, calculate and
+    return the possible hand values as an integer list.
+    
+    If the cards contain an ace, there might be two possible 
+    hand values. In almost all other cases, there will only
+    be one hand value.
+    
+    There will never be more than two hand values since only
+    one ace can be counted as an 11 at a time without going
+    over 21. Therefore, the returned integer list's length 
+    will be: 0 < length <= 2.
+    
+    >>> hand_value([ { "rank": "A", "suit": "clubs", "hidden": false } ])
+    [1, 11]
+    
+    >>> hand_value([ { "rank": "K", "suit": "spades", "hidden": false } ])
+    [10]
+    '''
+
     has_ace = False
     primary_value = 0
 
@@ -47,6 +67,9 @@ def hand_value(cards: [dict]) -> [int]:
             
 
 def hand_state(cards: [dict]) -> dict:
+    '''
+    '''
+    
     values = hand_value(cards)
     
     if len(cards) == 2 and max(values) == 21:
