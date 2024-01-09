@@ -253,7 +253,7 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
                         decisions += "\n  (sp)lit hands"
                         choices.append("sp")
                     
-                    if settings["doubling"]["value"] == True and (current_balance > initial_bet):
+                    if settings["doubling"]["value"] == True and (current_balance >= initial_bet):
                         decisions += "\n  (d)ouble down"
                         choices.append('d')
                     
