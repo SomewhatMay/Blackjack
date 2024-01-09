@@ -13,7 +13,8 @@ import time
 SUITS = ["clubs", "diamonds", "spades", "hearts"] # QUESTION Making this list a constant since it will never be changed
 
 ## Global Variables ##
-balance = 1000.00
+DEFAULT_BALANCE = 1000.0
+current_balance = 0
 
 settings = {
     # Each settings dictionary will have an additional 'value' 
@@ -200,7 +201,7 @@ def split(hand, user_hands):
 
 def play_user(user_hands, dealer_hand, initial_bet) -> dict:
     # QUESTION another global keyword usage... is this okay?
-    global balance
+    global current_balance
     
     # Use a while loop since the length of hands can change
     # during the game from splitting
@@ -252,7 +253,7 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
                         decisions += "\n  (sp)lit hands"
                         choices.append("sp")
                     
-                    if settings["doubling"]["value"] == True and (balance > initial_bet):
+                    if settings["doubling"]["value"] == True and (current_balance > initial_bet):
                         decisions += "\n  (d)ouble down"
                         choices.append('d')
                     
@@ -271,19 +272,19 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
                     hit(hand)
                     
                 elif decision == 'd':
-                    balance -= hand["bet"]
+                    current_balance -= hand["bet"]
                     hand["bet"] *= 2
                     hand["double_bet"] = True
                     doubled = True
                     print(f"You've doubled your bet to a total bet of ${hand['bet']:.2f}.")
-                    print(f"Your current balance: {balance:.2f}")
+                    print(f"Your current balance: {current_balance:.2f}")
                     
                 elif decision == 'sp':
                     split(hand, user_hands)
                 
                 elif decision == 'f':
                     print(f"You've forfeited and have been returned ${initial_bet / 2} (half of your initial bet).")
-                    balance += initial_bet / 2
+                    current_balance += initial_bet / 2
 
                     hand_complete = True
                     forfeited = True
@@ -376,17 +377,16 @@ def tutorial():
 
 
 def start_game():
-    # QUESTION Is this okay?
-    global balance
+    global current_balance
     
     display.title("GAME")
 
     # FIXME do something when the user has no more money
-    print(f"Balance: ${balance:.2f}")
+    print(f"Balance: ${current_balance:.2f}")
     print("Enter an integer dollar amount to bet: ")
-    initial_bet = get_int_range("> $", 1, balance) * 1.0
+    initial_bet = get_int_range("> $", 1, current_balance) * 1.0
     total_bet = initial_bet
-    balance -= initial_bet
+    current_balance -= initial_bet
     print(f"Your bet: ${initial_bet}")
     print()
     
@@ -436,7 +436,7 @@ def start_game():
         
         total_outcome = profit - total_bet
         
-        balance += profit
+        current_balance += profit
         
         print()
         print("Results:")
@@ -522,10 +522,22 @@ def toggle_settings():
         display.await_continue("[press enter to return to settings menu...]")
 
 
+def restart_game() -> float:
+    global current_balance
+    
+    print()
+    print("Are you sure you want to restart game? This will reset your balance!")
+    print("(y)es/(n)o")
+    decision = get_decision("> ", ['y', 'n'])
+    
+    if decision == 'y':
+        current_balance = DEFAULT_BALANCE
+
+
 def main():
     '''The main function that handles the primary input and logic of the game interface.'''
     
-    global ranks
+    global ranks, current_balance
     
     # Add a 'value' key into each setting and set it as the default.
     for setting in settings.values():
@@ -552,20 +564,24 @@ def main():
 
     display.intro()
     
+    current_balance = DEFAULT_BALANCE
+    
     while True:
         display.menu()
         decision = get_int_range("> ", 1, 5)
-        
+
         if decision == 1:
             start_game()
         elif decision == 2:
             toggle_settings()
         elif decision == 3:
             # TODO Maybe add some other statistics if we have enough time?
-            print(f"\nYour balance is ${balance:.2f}")
+            print(f"\nYour balance is ${current_balance:.2f}")
         elif decision == 4:
-            tutorial()
+            restart_game()
         elif decision == 5:
+            tutorial()
+        elif decision == 6:
             display.goodbye()
             
             break

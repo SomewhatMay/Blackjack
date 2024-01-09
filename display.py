@@ -307,8 +307,9 @@ def menu():
     print("1. Start game")
     print("2. Options")
     print("3. View Balance")
-    print("4. Tutorial")
-    print("5. Exit")
+    print("4. Restart game")
+    print("5. Tutorial")
+    print("6. Exit")
 
 
 def title(label: str):
