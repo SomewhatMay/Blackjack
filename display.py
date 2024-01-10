@@ -8,14 +8,26 @@ import time
 
 
 suit_symbols = {
-    'spades': '♠',
-    'hearts': '♥',
-    'diamonds': '♦',
-    'clubs': '♣',
+    's': '♠',
+    'h': '♥',
+    'd': '♦',
+    'c': '♣',
 }
 
 
-def hand_value(cards: [dict]) -> [int]:
+def get_suit(card: str) -> str:
+    return card[-2]
+
+
+def is_hidden(card: str) -> bool:
+    return True if card[-1] == 1 else False
+
+
+def get_rank(card: str) -> str:
+    return card[:-2]
+
+
+def hand_value(cards: [str]) -> [int]:
     '''Using only the visible cards in cards, calculate and
     return the possible hand values as an integer list.
     

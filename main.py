@@ -10,7 +10,12 @@ import time
 
 
 ## Constants ##
-SUITS = ["clubs", "diamonds", "spades", "hearts"] # QUESTION Making this list a constant since it will never be changed
+SUITS = [
+    "c", # clubs
+    "d", # diamonds
+    "s", # spades
+    "h" # hearts
+]
 
 ## Global Variables ##
 DEFAULT_BALANCE = 1000.0
@@ -64,9 +69,9 @@ settings = {
     }
 }
 
-ranks: [str] = [] # QUESTION loaded during runtime - is this okay? Should they be loaded in main()?
+ranks = list(range(1, 14)) # FIXME fix this
 remaining_cards = {}
-remaining_suits = {} # QUESTION loaded during runtime as well...
+remaining_suits = {}
 
 
 def get_int(message: str) -> int:
@@ -126,20 +131,20 @@ mock_deck = ""
 #########################
 
 # QUESTION default nullable parameter
-def draw_card(hidden: bool=False) -> dict:
+def draw_card(hidden: bool=False) -> str:
     '''Get a random card from the deck and return its information.'''
     
     #########################
     ## DEPLOY remove this before deploying!
     global mock_deck
     
+    card = ""
+    
     if mock_deck != "":
         rank = mock_deck[0]
         
-        if rank != "K" and rank != "Q" and rank != "J" and rank != "A":
-            rank = int(rank)
-        
         suit = random.choice(SUITS)
+        
         mock_deck = mock_deck[1:]
     #########################
     
@@ -151,22 +156,20 @@ def draw_card(hidden: bool=False) -> dict:
         if sum(remaining_cards.values()) == 0:
             shuffle_deck()
         
-        # QUESTION random.choices; the hacky indexing;
         rank = random.choices(list(remaining_cards.keys()), weights=list(remaining_cards.values()))[0]
         remaining_cards[rank] -= 1
         
         available_suits = remaining_suits[rank]
         suit = random.choices(list(available_suits.keys()), weights=list(available_suits.values()))[0]
         available_suits[suit] -= 1
-        
-    return {
-        "rank": rank,
-        "suit": suit,
-        "hidden": hidden,
-    }
+    
+    card = f"{rank}{suit}"
+    card += "1" if hidden else "0"
+
+    return card
 
 
-def new_hand(bet: int, cards: list) -> dict:
+def new_hand(bet: int, cards: [str]) -> dict:
     return {
         "bet": bet,
         "cards": cards,
@@ -179,9 +182,9 @@ def hit(hand: dict):
     new_card = draw_card()
     hand["cards"].insert(0, new_card)
     
-    suit_symbol = display.suit_symbols[new_card["suit"]]
+    suit_symbol = display.suit_symbols[display.get_suit(new_card)]
     
-    print(f"Drew a {new_card['rank']}{suit_symbol}.")
+    print(f"Drew a {display.get_rank(new_card)}{suit_symbol}.")
     print()
 
 
@@ -542,14 +545,6 @@ def main():
     # Add a 'value' key into each setting and set it as the default.
     for setting in settings.values():
         setting["value"] = setting["default"]
-    
-    # Add the ranks
-    ranks.append('A')
-    
-    for i in range(2, 11):
-        ranks.append(i)
-    
-    ranks += ['J', 'Q', 'K']
     
     # Add a key for each rank in remaining_suits, storing a dictionary
     # of suits as keys and the corresponding remaining cards of that 
