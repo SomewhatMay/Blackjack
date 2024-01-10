@@ -14,6 +14,13 @@ suit_symbols = {
     'c': '♣',
 }
 
+rank_symbols = {
+    1: 'A',
+    11: 'J',
+    12: 'Q',
+    13: 'K',
+}
+
 
 def get_suit(card: str) -> str:
     return card[-2]
@@ -51,20 +58,21 @@ def hand_value(cards: [str]) -> [int]:
     primary_value = 0
 
     for card in cards:
-        if card["hidden"] == True:
+        if is_hidden(card) == True:
             continue
         
-        rank = card["rank"]
+        rank = get_rank(card)
         
-        if rank == 'A':
+        if rank == '1':
             if has_ace:
                 primary_value += 1
             else:
                 has_ace = True
-        elif rank == 'J' or rank == 'Q' or rank == 'K':
+        elif int(rank) >= 10:
+            # Ensure that a 10, Jack, Queen, and King all are valued at 10.
             primary_value += 10
         else:
-            primary_value += rank
+            primary_value += int(rank)
     
     values = [primary_value]
     
@@ -78,10 +86,8 @@ def hand_value(cards: [str]) -> [int]:
     return values
             
 
+# TODO ensure that this function ONLY returns the state!
 def hand_state(cards: [dict]) -> dict:
-    '''
-    '''
-    
     values = hand_value(cards)
     
     if len(cards) == 2 and max(values) == 21:
@@ -213,18 +219,19 @@ def half_card(hidden: bool):
 ═══╝"""
 
 
-def print_cards(cards: [dict]):
+def print_cards(cards: [str]):
     card_drawings = []
     
     for i in range(len(cards)):
         card = cards[i]
-        suit_symbol = suit_symbols[card["suit"]]
-        rank = card["rank"]
+        suit_symbol = suit_symbols[get_suit(card)]
+        rank = get_rank(card)
+        hidden = is_hidden(card)
         
         if i == 0:
-            drawing = full_card(card["hidden"])
+            drawing = full_card(hidden)
         else:
-            drawing = half_card(card["hidden"])
+            drawing = half_card(hidden)
         
         card_drawings.append(drawing.format(rank, suit_symbol, suit_symbol, suit_symbol, rank))
     
