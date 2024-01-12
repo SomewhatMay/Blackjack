@@ -442,13 +442,17 @@ def start_game():
         
         total_outcome = profit - total_bet
         
+        # Store the sign of total_outcome so we can position
+        # it before the dollar sign in the output.
+        sign = "" if total_outcome >= 0 else "-"
+        
         current_balance += profit
         
         print()
         print("Results:")
         print(f"  Return: ${profit:.2f}")
         print(f"  Total bet: -${total_bet:.2f}")
-        print(f"  Total earnings: ${total_outcome:.2f}")
+        print(f"  Total earnings: {sign}${abs(total_outcome):.2f}")
     
     display.title("GAME OVER")
     print()
