@@ -27,11 +27,11 @@ def get_suit(card: str) -> str:
 
 
 def is_hidden(card: str) -> bool:
-    return True if card[-1] == 1 else False
+    return True if card[-1] == "1" else False
 
 
-def get_rank(card: str) -> str:
-    return card[:-2]
+def get_rank(card: str) -> int:
+    return int(card[:-2])
 
 
 def get_rank_symbol(rank: int) -> str:
@@ -234,13 +234,15 @@ def print_cards(cards: [str]):
         suit_symbol = suit_symbols[get_suit(card)]
         rank = get_rank(card)
         hidden = is_hidden(card)
+        rank_symbol = get_rank_symbol(rank)
         
         if i == 0:
             drawing = full_card(hidden)
         else:
             drawing = half_card(hidden)
         
-        card_drawings.append(drawing.format(get_rank_symbol(rank), suit_symbol, suit_symbol, suit_symbol, rank))
+        print("Stuff:", get_rank_symbol(rank))
+        card_drawings.append(drawing.format(rank_symbol, suit_symbol, suit_symbol, suit_symbol, rank_symbol))
     
     output_lines = get_lines(card_drawings)
     

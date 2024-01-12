@@ -127,7 +127,7 @@ def shuffle_deck():
 
 #########################
 ## DEPLOY remove this before deploying!
-mock_deck = "2222"
+mock_deck = [11, 12, 13, 11]
 #########################
 
 # QUESTION default nullable parameter
@@ -140,7 +140,7 @@ def draw_card(hidden: bool=False) -> str:
     
     card = ""
     
-    if mock_deck != "":
+    if len(mock_deck) != 0:
         rank = mock_deck[0]
         
         suit = random.choice(SUITS)
