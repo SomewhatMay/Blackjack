@@ -127,10 +127,9 @@ def shuffle_deck():
 
 #########################
 ## DEPLOY remove this before deploying!
-mock_deck = [11, 12, 13, 11]
+mock_deck = [2] * 4
 #########################
 
-# QUESTION default nullable parameter
 def draw_card(hidden: bool=False) -> str:
     '''Get a random card from the deck and return its information.'''
     
@@ -328,6 +327,7 @@ def play_dealer(dealer_hand, user_hands):
         display.print_hands_all(dealer_hand, user_hands)
 
 
+# TODO Fix the spacing for the "You" tag
 def tutorial():
     display.print_yield("Welcome to BLACKJACK!")
 

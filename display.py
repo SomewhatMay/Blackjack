@@ -110,7 +110,6 @@ def hand_state(cards: [dict]) -> dict:
     }
 
 
-# QUESTION nullable parameter?
 def graphical_hand_state(primary_hand: dict, secondary_hand: dict=None) -> str:
     primary_state_info = hand_state(primary_hand["cards"])
     primary_state = primary_state_info["state"]
@@ -241,22 +240,18 @@ def print_cards(cards: [str]):
         else:
             drawing = half_card(hidden)
         
-        print("Stuff:", get_rank_symbol(rank))
         card_drawings.append(drawing.format(rank_symbol, suit_symbol, suit_symbol, suit_symbol, rank_symbol))
     
     output_lines = get_lines(card_drawings)
     
     for line in output_lines:
         print(line)
-    
-    print()
 
 
 def print_dealer_hand(dealer_hand: dict):
     print("Dealer's hand:")
     print_cards(dealer_hand["cards"])
-    # QUESTION should I split up the nested function calls?
-    print(graphical_hand_state(dealer_hand))
+    print("Value: " + graphical_hand_state(dealer_hand))
     print()
 
 
@@ -269,8 +264,7 @@ def print_user_hand(user_hand: dict, dealer_hand: dict, hand_count_ratio: str=No
     print(hand_count_output + ":")
     
     print_cards(user_hand["cards"])
-    # QUESTION should I split up the nested function calls?
-    print(graphical_hand_state(user_hand, dealer_hand))
+    print("Value: " + graphical_hand_state(user_hand, dealer_hand))
     print()
 
 
@@ -283,7 +277,9 @@ def print_hands_all(dealer_hand: dict, user_hands: [dict]):
     print_dealer_hand(dealer_hand)
     
     if len(user_hands) > 1:
-        # Use minimal layout
+        # Use minimal layout if the user has multiple hands
+        print("Your hands:")
+        
         for i in range(len(user_hands)):
             hand = user_hands[i]
             graphical_state = graphical_hand_state(hand, dealer_hand)
