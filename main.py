@@ -566,7 +566,7 @@ def main():
     
     while True:
         display.menu()
-        decision = get_int_range("> ", 1, 5)
+        decision = get_int_range("> ", 1, 6)
 
         if decision == 1:
             start_game()
