@@ -34,6 +34,13 @@ def get_rank(card: str) -> str:
     return card[:-2]
 
 
+def get_rank_symbol(rank: int) -> str:
+    if rank in rank_symbols:
+        return rank_symbols[rank]
+
+    return str(rank)
+
+
 def hand_value(cards: [str]) -> [int]:
     '''Using only the visible cards in cards, calculate and
     return the possible hand values as an integer list.
@@ -63,7 +70,7 @@ def hand_value(cards: [str]) -> [int]:
         
         rank = get_rank(card)
         
-        if rank == '1':
+        if rank == 1:
             if has_ace:
                 primary_value += 1
             else:
@@ -233,7 +240,7 @@ def print_cards(cards: [str]):
         else:
             drawing = half_card(hidden)
         
-        card_drawings.append(drawing.format(rank, suit_symbol, suit_symbol, suit_symbol, rank))
+        card_drawings.append(drawing.format(get_rank_symbol(rank), suit_symbol, suit_symbol, suit_symbol, rank))
     
     output_lines = get_lines(card_drawings)
     
@@ -251,7 +258,6 @@ def print_dealer_hand(dealer_hand: dict):
     print()
 
 
-# QUESTION nullable parameter?
 def print_user_hand(user_hand: dict, dealer_hand: dict, hand_count_ratio: str=None):
     hand_count_output = "Your hand"
     
@@ -266,7 +272,6 @@ def print_user_hand(user_hand: dict, dealer_hand: dict, hand_count_ratio: str=No
     print()
 
 
-# QUESTION nullable parameter?
 def print_hands(dealer_hand: dict, user_hand: [dict], hand_count_ratio: str=None):
     print_dealer_hand(dealer_hand)
     print_user_hand(user_hand, dealer_hand, hand_count_ratio)

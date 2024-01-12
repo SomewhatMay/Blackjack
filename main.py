@@ -127,7 +127,7 @@ def shuffle_deck():
 
 #########################
 ## DEPLOY remove this before deploying!
-mock_deck = ""
+mock_deck = "2222"
 #########################
 
 # QUESTION default nullable parameter
@@ -184,7 +184,7 @@ def hit(hand: dict):
     
     suit_symbol = display.suit_symbols[display.get_suit(new_card)]
     
-    print(f"Drew a {display.get_rank(new_card)}{suit_symbol}.")
+    print(f"Drew a {display.get_rank_symbol(display.get_rank(new_card))}{suit_symbol}.")
     print()
 
 
@@ -231,7 +231,7 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
                 display.print_hands(dealer_hand, hand, hand_count_ratio)
                 
                 if hand["is_split"]:
-                    if hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
+                    if display.get_rank(hand["cards"][0]) == display.get_rank(hand["cards"][1]):
                         print("Would you like to:\n  (sp)lit\n  (s)tand")
                         decision = get_decision("> ", ['s', "sp"])
                         
@@ -252,7 +252,7 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
                 choices = ['h', 's']
                 
                 if turn == 1:
-                    if settings["splitting"]["value"] == True and hand["cards"][0]["rank"] == hand["cards"][1]["rank"]:
+                    if settings["splitting"]["value"] == True and display.get_rank(hand["cards"][0]) == display.get_rank(hand["cards"][1]):
                         decisions += "\n  (sp)lit hands"
                         choices.append("sp")
                     
@@ -308,11 +308,14 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
 
 def reveal_hidden_card(dealer_hand):
     second_card = dealer_hand["cards"][1]
-    second_card["hidden"] = False
-    suit_symbol = display.suit_symbols[second_card["suit"]]
+    
+    # Set the card's hidden value to false
+    dealer_hand["cards"][1] = dealer_hand["cards"][1][:-1] + "0"
+
+    suit_symbol = display.suit_symbols[display.get_suit(second_card)]
     
     print()
-    print(f"The dealer's hidden card was a {second_card['rank']}{suit_symbol}!")
+    print(f"The dealer's hidden card was a {display.get_rank_symbol(display.get_rank(second_card))}{suit_symbol}!")
 
 
 def play_dealer(dealer_hand, user_hands):
@@ -443,9 +446,9 @@ def start_game():
         
         print()
         print("Results:")
-        print(f"  Return: {profit:.2f}")
+        print(f"  Return: ${profit:.2f}")
         print(f"  Total bet: -${total_bet:.2f}")
-        print(f"  Total earnings: {total_outcome:.2f}")
+        print(f"  Total earnings: ${total_outcome:.2f}")
     
     display.title("GAME OVER")
     print()
