@@ -94,7 +94,7 @@ def hand_value(cards: [str]) -> [int]:
             
 
 # TODO ensure that this function ONLY returns the state!
-def hand_state(cards: [dict]) -> dict:
+def hand_state(cards: [dict]) -> str:
     values = hand_value(cards)
     
     if len(cards) == 2 and max(values) == 21:
@@ -104,16 +104,13 @@ def hand_state(cards: [dict]) -> dict:
     else:
         state = "safe"
 
-    return {
-        "state": state,
-        "values": values,
-    }
+    return state
 
 
 def graphical_hand_state(primary_hand: dict, secondary_hand: dict=None) -> str:
-    primary_state_info = hand_state(primary_hand["cards"])
-    primary_state = primary_state_info["state"]
-    primary_values = primary_state_info["values"]
+    primary_cards = primary_hand["cards"]
+    primary_state = hand_state(primary_cards)
+    primary_values = hand_value(primary_cards)
     
     state_display = ""
     
@@ -129,8 +126,7 @@ def graphical_hand_state(primary_hand: dict, secondary_hand: dict=None) -> str:
                 state_display += " / "
     
     if secondary_hand != None:
-        secondary_state_info = hand_state(secondary_hand["cards"])
-        secondary_values = max(secondary_state_info["values"])
+        secondary_values = max(hand_value(secondary_hand["cards"]))
         
         if min(primary_values) <= 21:
             if max(primary_values) == secondary_values:
