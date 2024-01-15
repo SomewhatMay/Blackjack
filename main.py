@@ -386,6 +386,9 @@ def tutorial():
 
 
 def start_game():
+    '''Commence the main game, handle betting, user's turn, dealer's turn, and display
+    the results of the game.'''
+    
     global current_balance
     
     display.title("GAME")
@@ -404,9 +407,10 @@ def start_game():
     display.print_yield("Dealing cards...", 1)
     
     # Since the user can have multiple hands by splitting,
-    # we will have a list that contains all of them
+    # we will have a list that contains all of them.
     user_hands = []
     
+    # Create the initial user and dealer hands
     user_hands.append(
         new_hand(initial_bet, [draw_card(), draw_card()])
     )
@@ -415,6 +419,7 @@ def start_game():
     user_result = play_user(user_hands, dealer_hand, initial_bet)
     print()
     
+    # LEFT HERE TODO
     if user_result["doubled"]:
         total_bet *= 2
     
@@ -463,6 +468,8 @@ def start_game():
 
 ## Settings functions ##
 def reset_settings():
+    '''Reset each setting to its default value.'''
+
     for setting in settings.values():
         setting["value"] = setting["default"]
     
@@ -470,6 +477,10 @@ def reset_settings():
 
 
 def change_setting(setting: dict):
+    '''Display the change settings interface with specific information such
+    as the current value of the setting, instructions on how to change the setting's value,
+    and also handle updating the setting.'''
+    
     print(f"\nCurrent value: {setting['value']}")
             
     # Retrieve a new value depending on the type of setting.
@@ -500,11 +511,12 @@ def change_setting(setting: dict):
 
 
 def toggle_settings():
+    '''Toggle and handle the settings interface and user input such as changing the setting
+    or reading the description of a setting.'''
+    
     while True:
         display.settings_menu(settings)
         
-        # Add two to upper bound since the last two 
-        # selections are for resetting all settings and returning to menu.
         selection = get_int_range("Select a setting: ", 1, len(settings))
         
         # Second last option (reset settings).
@@ -537,7 +549,10 @@ def toggle_settings():
         display.await_continue("[press enter to return to settings menu...]")
 
 
-def restart_game() -> float:
+def restart_game():
+    '''Reset the statistics of the user if they confirm they want
+    to restart, making it seem like a new game.'''
+
     global current_balance
     
     print()
@@ -550,7 +565,7 @@ def restart_game() -> float:
 
 
 def main():
-    '''The main function that handles the primary input and logic of the game interface.'''
+    '''Handles the primary input and logic of the game interface.'''
     
     global ranks, current_balance
     
