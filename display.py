@@ -93,7 +93,6 @@ def hand_value(cards: [str]) -> [int]:
     return values
             
 
-# TODO ensure that this function ONLY returns the state!
 def hand_state(cards: [dict]) -> str:
     values = hand_value(cards)
     
@@ -107,7 +106,7 @@ def hand_state(cards: [dict]) -> str:
     return state
 
 
-def graphical_hand_state(primary_hand: dict, secondary_hand: dict=None) -> str:
+def graphical_hand_state(primary_hand: dict) -> str:
     primary_cards = primary_hand["cards"]
     primary_state = hand_state(primary_cards)
     primary_values = hand_value(primary_cards)
@@ -122,25 +121,46 @@ def graphical_hand_state(primary_hand: dict, secondary_hand: dict=None) -> str:
         for i in range(len(primary_values)):
             state_display += str(primary_values[i])
             
+            # Only append a slash if it is not the last value
+            # in the primary_values list
             if i != (len(primary_values) - 1):
                 state_display += " / "
     
-    if secondary_hand != None:
-        secondary_values = max(hand_value(secondary_hand["cards"]))
+    # if secondary_hand != None:
+    #     secondary_values = max(hand_value(secondary_hand["cards"]))
         
-        if min(primary_values) <= 21:
-            if max(primary_values) == secondary_values:
-                state_display += " (PUSH)"
-            elif secondary_values > 21 or max(primary_values) > secondary_values:
-                state_display += " (WIN)"
-            elif max(primary_values) < secondary_values:
-                state_display += " (LOSS)"
-                
+    #     if min(primary_values) <= 21:
+    #         if max(primary_values) == secondary_values:
+    #             state_display += " (PUSH)"
+    #         elif secondary_values > 21 or max(primary_values) > secondary_values:
+    #             state_display += " (WIN)"
+    #         elif max(primary_values) < secondary_values:
+    #             state_display += " (LOSS)"
         
     if primary_hand["bet"] > 0:
         state_display += f" - ${primary_hand['bet']}"
 
     return state_display
+
+
+def graphical_hand_comparison(primary_cards: [str], secondary_cards: [str]) -> str:
+    primary_values = hand_value(primary_cards)
+    
+    # The maximum hand value of the secondary hand value(s)
+    # is what the primary hand is compared to
+    secondary_value = max(hand_value(secondary_cards))
+
+    comparison = ""
+        
+    if min(primary_values) <= 21:
+        if max(primary_values) == secondary_value:
+            comparison += " (PUSH)"
+        elif secondary_value > 21 or max(primary_values) > secondary_value:
+            comparison += " (WIN)"
+        elif max(primary_values) < secondary_value:
+            comparison += " (LOSS)"
+    
+    return comparison
 
 
 def get_lines(drawings: [str]) -> [str]:
@@ -259,8 +279,10 @@ def print_user_hand(user_hand: dict, dealer_hand: dict, hand_count_ratio: str=No
     
     print(hand_count_output + ":")
     
-    print_cards(user_hand["cards"])
-    print("Value: " + graphical_hand_state(user_hand, dealer_hand))
+    user_cards = user_hand["cards"]
+    dealer_cards = dealer_hand["cards"]
+    print_cards(user_cards)
+    print("Value: " + graphical_hand_state(user_hand) + graphical_hand_comparison(user_cards, dealer_cards))
     print()
 
 
@@ -278,7 +300,8 @@ def print_hands_all(dealer_hand: dict, user_hands: [dict]):
         
         for i in range(len(user_hands)):
             hand = user_hands[i]
-            graphical_state = graphical_hand_state(hand, dealer_hand)
+            
+            graphical_state = graphical_hand_state(hand) + graphical_hand_comparison(hand["cards"], dealer_hand["cards"])
             print(f"  Hand #{i+1}: {graphical_state}")
     else:
         # Use standard layout
@@ -290,7 +313,17 @@ def intro():
     only plays at the beginning of the game.'''
     
     # TODO Improve this!
-    print("BLACKJACK!")
+
+    print()
+    print(""" /$$$$$$$  /$$        /$$$$$$   /$$$$$$  /$$   /$$    /$$$$$  /$$$$$$   /$$$$$$  /$$   /$$
+| $$__  $$| $$       /$$__  $$ /$$__  $$| $$  /$$/   |__  $$ /$$__  $$ /$$__  $$| $$  /$$/
+| $$  \ $$| $$      | $$  \ $$| $$  \__/| $$ /$$/       | $$| $$  \ $$| $$  \__/| $$ /$$/ 
+| $$$$$$$ | $$      | $$$$$$$$| $$      | $$$$$/        | $$| $$$$$$$$| $$      | $$$$$/  
+| $$__  $$| $$      | $$__  $$| $$      | $$  $$   /$$  | $$| $$__  $$| $$      | $$  $$  
+| $$  \ $$| $$      | $$  | $$| $$    $$| $$\  $$ | $$  | $$| $$  | $$| $$    $$| $$\  $$ 
+| $$$$$$$/| $$$$$$$$| $$  | $$|  $$$$$$/| $$ \  $$|  $$$$$$/| $$  | $$|  $$$$$$/| $$ \  $$
+|_______/ |________/|__/  |__/ \______/ |__/  \__/ \______/ |__/  |__/ \______/ |__/  \__/""")
+    # print("------------------------------------------------------------------------------------------")
 
 
 def settings_menu(settings):
@@ -304,15 +337,12 @@ def settings_menu(settings):
         print(f"{counter}. {(setting['display_name']):<30}{setting['value']}")
 
 
-# QUESTION nullable/default parameter
 def await_continue(message: str = "[press enter to continue...]"):
     '''Waits for the user to want to continue by asking for an empty input.'''
     
-    print()
     input(message)
 
 
-# QUESTION nullable/default paramter?
 def print_yield(message: str="", duration: int=.5):
     print(message)
     time.sleep(duration)

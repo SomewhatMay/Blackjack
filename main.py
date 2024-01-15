@@ -223,6 +223,7 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
             display.print_hands(dealer_hand, hand, hand_count_ratio)
             
             if hand["is_split"] == True or hand["double_bet"] == True:
+                print()
                 display.await_continue("[press enter to draw your final card...]")
                     
                 hit(hand)
@@ -241,8 +242,10 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
                             # complete since it needs at least two cards to be complete
                             continue
                     else:
+                        print()
                         display.await_continue("[press enter to complete this hand...]")
                 else:
+                    print()
                     display.await_continue("[press enter to end your turn...]")
 
                 hand_complete = True
@@ -322,12 +325,12 @@ def play_dealer(dealer_hand, user_hands):
     display.print_hands_all(dealer_hand, user_hands)
 
     while min(display.hand_value(dealer_hand["cards"])) < 17:
+        print()
         display.await_continue()
         hit(dealer_hand)
         display.print_hands_all(dealer_hand, user_hands)
 
 
-# TODO Fix the spacing for the "You" tag
 def tutorial():
     display.print_yield("Welcome to BLACKJACK!")
 
@@ -424,7 +427,7 @@ def start_game():
         print("Game Over.")
         print(f"Lost bet: {total_bet}")
     else:
-        print("Your turn is complete. Dealer will deal now.")
+        print("Your turn is complete. Dealer will deal now.\n")
         display.await_continue()
         
         play_dealer(dealer_hand, user_hands)
@@ -507,6 +510,7 @@ def toggle_settings():
         # Second last option (reset settings).
         if selection == len(settings) - 1:
             reset_settings()
+            print()
             display.await_continue("[press enter to return to settings menu...]")
             continue
 
@@ -528,7 +532,8 @@ def toggle_settings():
         
         elif decision == 'g':
             continue
-            
+        
+        print()
         display.await_continue("[press enter to return to settings menu...]")
 
 
