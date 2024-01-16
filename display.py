@@ -311,8 +311,6 @@ def print_hands_all(dealer_hand: dict, user_hands: [dict]):
 def intro():
     '''Display the introduction of the game which 
     only plays at the beginning of the game.'''
-    
-    # TODO Improve this!
 
     print()
     print(""" /$$$$$$$  /$$        /$$$$$$   /$$$$$$  /$$   /$$    /$$$$$  /$$$$$$   /$$$$$$  /$$   /$$

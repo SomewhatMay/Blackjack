@@ -75,7 +75,7 @@ remaining_suits = {}
 
 
 def get_int(message: str) -> int:
-    '''Prompt the user with message to enter an integer to be returned.'''
+    '''Prompt the user with message to enter an integer which is then returned.'''
     
     while True:
         try:
@@ -101,9 +101,9 @@ def get_int_range(message: str, min_: int, max_: int) -> int:
             print(f"Input out of range. Try a value from {min_} to {max_} (both inclusive)")
 
 
-def get_decision(message: str, choices: [str]):
-    '''Prompt the user with the message 
-    and retrieve a valid decision present in choices.'''
+def get_decision(message: str, choices: [str]) -> str:
+    '''Prompt the user with the message, accepting and returning 
+    the user's decision only if it is present in choices.'''
     
     while True:
         decision = input(message).lower()
@@ -115,12 +115,14 @@ def get_decision(message: str, choices: [str]):
 
 
 def shuffle_deck():
-    if settings["true_random"]["value"] != True:
-        for rank in ranks:
-            remaining_cards[rank] = settings["deck_count"]["value"] * len(SUITS)
-            
-            for suit in SUITS:
-                remaining_suits[rank][suit] = settings["deck_count"]["value"]
+    '''Reset the remaining_cards and the remaining_suits dictionaries with 
+    their original values to simulate shuffled decks.'''
+    
+    for rank in ranks:
+        remaining_cards[rank] = settings["deck_count"]["value"] * len(SUITS)
+        
+        for suit in SUITS:
+            remaining_suits[rank][suit] = settings["deck_count"]["value"]
 
 
 ## Main game functions ##
@@ -206,8 +208,12 @@ def hit(hand: dict):
 
 
 def split(hand: dict, user_hands: [dict]):
-    '''Split hand into two individual hands and append 
-    them to user_hands.'''
+    '''Split hand, their cards, and their bets into two individual hands,
+    appending both hands to user_hands.
+    
+    It is assumed that hand contains only 2 same-rank
+    cards.
+    '''
     
     second_card = hand["cards"].pop()
     hand["bet"] /= 2
@@ -223,6 +229,7 @@ def split(hand: dict, user_hands: [dict]):
 
 
 def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict:    
+    # TODO Too wordy? Do I need to incorporate what the 'final state' means?
     '''Manage the player's turn, return the final state of the turn, 
     comparing their hand(s) to the dealer_hand and allowing them to hit, 
     stand, split, double the initial_bet, or even forfeit 
@@ -280,7 +287,7 @@ def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict
                 # Mark the hand as complete if the user does has received a second card.
                 hand_complete = True
             else:
-                decisions = "  (h)it\n  (s)tand"
+                choices_display = "  (h)it\n  (s)tand"
                 choices = ['h', 's']
                 
                 if turn == 1:
@@ -288,18 +295,18 @@ def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict
                     # in the settings and the hand state is proper.
                     
                     if settings["splitting"]["value"] == True and display.get_rank(hand["cards"][0]) == display.get_rank(hand["cards"][1]):
-                        decisions += "\n  (sp)lit hands"
+                        choices_display += "\n  (sp)lit hands"
                         choices.append("sp")
                     
                     if settings["doubling"]["value"] == True and (current_balance >= initial_bet):
-                        decisions += "\n  (d)ouble down"
+                        choices_display += "\n  (d)ouble down"
                         choices.append('d')
                     
                     if settings["surrendering"]["value"] == True:
-                        decisions += "\n  (f)orfeit"
+                        choices_display += "\n  (f)orfeit"
                         choices.append('f')
                 
-                print(f"Would you like to:\n{decisions}")
+                print(f"Would you like to:\n{choices_display}")
                 decision = get_decision("> ", choices)
                 
                 if decision == 's':
