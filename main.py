@@ -228,26 +228,30 @@ def split(hand: dict, user_hands: [dict]):
 
 
 def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict:    
-    # TODO Too wordy? Do I need to incorporate what the 'final state' means?
-    '''Manage the player's turn, return the final state of the turn, 
+    '''Manage the player's turn, return the turn_state, 
     comparing their hand(s) to the dealer_hand and allowing them to hit, 
     stand, split, double the initial_bet, or even forfeit 
     each of the individual user_hands.'''
 
     global current_balance
     
+    # The final state of the user's turn describing 
+    # some of the outcomes of the game
+    turn_state = {
+        "forfeited": False,
+        "busted": False,
+        "doubled": False,
+    }
+    
     # Use a while loop since the length of hands can change
     # in the middle of the game by splitting hands.
-    forfeited = False
-    busted = False
-    doubled = False
     i = 0
-    while (not forfeited) and (not busted) and i < len(user_hands):
+    while (not turn_state["forfeited"]) and (not turn_state["busted"]) and i < len(user_hands):
         hand_complete = False
         turn = 0
         hand = user_hands[i]
         
-        while (not hand_complete) and (not forfeited):
+        while (not hand_complete) and (not turn_state["forfeited"]):
             turn += 1
             
             hand_count_ratio = f"{i+1}/{len(user_hands)}"
@@ -319,7 +323,7 @@ def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict
                     current_balance -= hand["bet"]
                     hand["bet"] *= 2
                     hand["double_bet"] = True
-                    doubled = True
+                    turn_state["doubled"] = True
                     print(f"You've doubled your bet to a total bet of ${hand['bet']:.2f}.")
                     print(f"Your current balance: {current_balance:.2f}")
                     
@@ -331,20 +335,16 @@ def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict
                     current_balance += initial_bet / 2
 
                     hand_complete = True
-                    forfeited = True
+                    turn_state["forfeited"] = True
                 
             if min(display.hand_value(hand["cards"])) > 21:
                 print("You have busted!")
-                busted = True
+                turn_state["busted"] = True
                 hand_complete = True
                 
         i += 1
-
-    return {
-        "forfeited": forfeited,
-        "busted": busted,
-        "doubled": doubled,
-    }
+        
+    return turn_state
 
 
 def reveal_hidden_card(dealer_hand: dict):

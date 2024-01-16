@@ -49,8 +49,7 @@ def is_hidden(card: str) -> bool:
 
 
 def get_rank(card: str) -> int:
-    # TODO Question - Should I have most of the comments in the docstring to explain the process? 
-    # OR is it recommended to spread the comments to the actual functions?
+    # TODO Put process in the docstring
      
     '''Return the rank of card as an integer.'''
     
