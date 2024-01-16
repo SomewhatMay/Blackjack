@@ -49,15 +49,10 @@ def is_hidden(card: str) -> bool:
 
 
 def get_rank(card: str) -> int:
-    # TODO Put process in the docstring
-     
-    '''Return the rank of card as an integer.'''
+    '''Return the rank of card as an integer by slicing
+    card and including all the characters up to but not including
+    the second last character.'''
     
-    # The rank of the card is represented by all the
-    # characters in card from the beginning up to but not
-    # including the last two characters of card since these 
-    # last two characters represent the suit and the 
-    # visibility respectively.
     return int(card[:-2])
 
 
