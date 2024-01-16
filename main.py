@@ -131,7 +131,13 @@ mock_deck = [2] * 4
 #########################
 
 def draw_card(hidden: bool=False) -> str:
-    '''Get a random card from the deck and return its information.'''
+    '''Draw a random card from the deck and return it as a string.
+    
+    Each card is stored as a str with the integer rank, the suit initial,
+    and the card's visibility as a 0 or 1. 
+    The format is f"{rank}{suit}{is_hidden}".
+    For example, an ace of hearts that is visible would be stored as "1h0".
+    '''
     
     #########################
     ## DEPLOY remove this before deploying!
@@ -168,7 +174,17 @@ def draw_card(hidden: bool=False) -> str:
     return card
 
 
-def new_hand(bet: int, cards: [str]) -> dict:
+def new_hand(bet: float, cards: [str]) -> dict:
+    '''Create and return a new hand as a dictionary containing
+    information such as the bet and the cards it contains.
+    
+    >>> new_hand(10.0, ["1c0", "11s0"])
+    {"bet": 10.0, "cards": ["1c0", "11s0"], "is_split": False, "double_bet": False}
+    
+    >>> new_hand(12.0, ["12d1"])
+    {"bet": 12.0, "cards": ["12d1"], "is_split": False, "double_bet": False}
+    '''
+    
     return {
         "bet": bet,
         "cards": cards,
@@ -178,6 +194,8 @@ def new_hand(bet: int, cards: [str]) -> dict:
 
 
 def hit(hand: dict):
+    '''Draw and insert a new card into hand and display the card's rank and symbol.'''
+    
     new_card = draw_card()
     hand["cards"].insert(0, new_card)
     
@@ -187,7 +205,10 @@ def hit(hand: dict):
     print()
 
 
-def split(hand, user_hands):
+def split(hand: dict, user_hands: [dict]):
+    '''Split hand into two individual hands and append 
+    them to user_hands.'''
+    
     second_card = hand["cards"].pop()
     hand["bet"] /= 2
     hand["is_split"] = True
@@ -201,12 +222,16 @@ def split(hand, user_hands):
     print()
 
 
-def play_user(user_hands, dealer_hand, initial_bet) -> dict:
-    # QUESTION another global keyword usage... is this okay?
+def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict:    
+    '''Manage the player's turn, return the final state of the turn, 
+    comparing their hand(s) to the dealer_hand and allowing them to hit, 
+    stand, split, double the initial_bet, or even forfeit 
+    each of the individual user_hands.'''
+
     global current_balance
     
     # Use a while loop since the length of hands can change
-    # during the game from splitting
+    # in the middle of the game by splitting hands.
     forfeited = False
     busted = False
     doubled = False
@@ -231,6 +256,8 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
                 display.print_hands(dealer_hand, hand, hand_count_ratio)
                 
                 if hand["is_split"]:
+                    # We only provide the option to split if the first and
+                    # second cards in the hand have the same rank
                     if display.get_rank(hand["cards"][0]) == display.get_rank(hand["cards"][1]):
                         print("Would you like to:\n  (sp)lit\n  (s)tand")
                         decision = get_decision("> ", ['s', "sp"])
@@ -238,8 +265,10 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
                         if decision == "sp":
                             split(hand, user_hands)
 
-                            # If we split again this hand into two again, the hand is still not 
-                            # complete since it needs at least two cards to be complete
+                            # If we split this hand into two again, the hand is still not 
+                            # complete since it must have at least two cards to be complete.
+                            # Therefore, we do not mark this hand as complete, and iterate
+                            # over to the next loop, allowing the user to draw one final card.
                             continue
                     else:
                         print()
@@ -248,12 +277,16 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
                     print()
                     display.await_continue("[press enter to end your turn...]")
 
+                # Mark the hand as complete if the user does has received a second card.
                 hand_complete = True
             else:
                 decisions = "  (h)it\n  (s)tand"
                 choices = ['h', 's']
                 
                 if turn == 1:
+                    # Allow each of the following decisions if they are enabled
+                    # in the settings and the hand state is proper.
+                    
                     if settings["splitting"]["value"] == True and display.get_rank(hand["cards"][0]) == display.get_rank(hand["cards"][1]):
                         decisions += "\n  (sp)lit hands"
                         choices.append("sp")
@@ -308,10 +341,13 @@ def play_user(user_hands, dealer_hand, initial_bet) -> dict:
     }
 
 
-def reveal_hidden_card(dealer_hand):
+def reveal_hidden_card(dealer_hand: dict):
+    '''Reveal the hidden dealer's hidden card by changing the last character
+    of the dealer_hand's second card to a 0 instead of a 1, indicating 
+    that the card is now visible.'''
+    
     second_card = dealer_hand["cards"][1]
     
-    # Set the card's hidden value to false
     dealer_hand["cards"][1] = dealer_hand["cards"][1][:-1] + "0"
 
     suit_symbol = display.suit_symbols[display.get_suit(second_card)]
@@ -320,7 +356,11 @@ def reveal_hidden_card(dealer_hand):
     print(f"The dealer's hidden card was a {display.get_rank_symbol(display.get_rank(second_card))}{suit_symbol}!")
 
 
-def play_dealer(dealer_hand, user_hands):
+def play_dealer(dealer_hand: dict, user_hands: [dict]):
+    '''Simulate the dealer's turn by displaying the hidden card, drawing until the
+    dealer_hand's overall value is greater than or equalled to a hard 17, 
+    and displaying the state of the each of the user_hands and the dealer_hand.'''
+    
     reveal_hidden_card(dealer_hand)
     display.print_hands_all(dealer_hand, user_hands)
 
@@ -332,6 +372,9 @@ def play_dealer(dealer_hand, user_hands):
 
 
 def tutorial():
+    '''Display the interactive tutorial dialogue, teaching the user how to play
+    the game properly.'''
+    
     display.print_yield("Welcome to BLACKJACK!")
 
     print("Game:")
@@ -416,10 +459,11 @@ def start_game():
     )
     dealer_hand = new_hand(0, [draw_card(), draw_card(True)])
     
+    # The user_result variable contains information regarding whether
+    # the user doubled, forefitted, or busted during their turn. 
     user_result = play_user(user_hands, dealer_hand, initial_bet)
     print()
     
-    # LEFT HERE TODO
     if user_result["doubled"]:
         total_bet *= 2
     
@@ -438,6 +482,7 @@ def start_game():
         play_dealer(dealer_hand, user_hands)
         dealer_values = display.hand_value(dealer_hand["cards"])
         
+        # Calculate the user's profit from this game
         profit = 0
         for hand in user_hands:
             user_values = display.hand_value(hand["cards"])
