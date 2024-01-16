@@ -182,7 +182,6 @@ def new_hand(bet: float, cards: [str]) -> dict:
     
     >>> new_hand(10.0, ["1c0", "11s0"])
     {"bet": 10.0, "cards": ["1c0", "11s0"], "is_split": False, "double_bet": False}
-    
     >>> new_hand(12.0, ["12d1"])
     {"bet": 12.0, "cards": ["12d1"], "is_split": False, "double_bet": False}
     '''

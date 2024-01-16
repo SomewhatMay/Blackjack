@@ -23,14 +23,42 @@ rank_symbols = {
 
 
 def get_suit(card: str) -> str:
+    '''Determine the suit initial of card and 
+    return it as a string.
+    
+    >>> get_suit("11h0")
+    "h"
+    >>> get_suit("1c0")
+    "c"
+    '''
+    
     return card[-2]
 
 
 def is_hidden(card: str) -> bool:
+    '''Return true if and only if the last character in card,
+    representing the visibility of the card, equals '1'.
+    
+    >>> is_hidden("12s0")
+    False
+    >>> is_hidden("3c1")
+    True
+    '''
+    
     return True if card[-1] == "1" else False
 
 
 def get_rank(card: str) -> int:
+    # TODO Question - Should I have most of the comments in the docstring to explain the process? 
+    # OR is it recommended to spread the comments to the actual functions?
+     
+    '''Return the rank of card as an integer.'''
+    
+    # The rank of the card is represented by all the
+    # characters in card from the beginning up to but not
+    # including the last two characters of card since these 
+    # last two characters represent the suit and the 
+    # visibility respectively.
     return int(card[:-2])
 
 
@@ -56,7 +84,6 @@ def hand_value(cards: [str]) -> [int]:
     
     >>> hand_value([ { "rank": "A", "suit": "clubs", "hidden": false } ])
     [1, 11]
-    
     >>> hand_value([ { "rank": "K", "suit": "spades", "hidden": false } ])
     [10]
     '''
