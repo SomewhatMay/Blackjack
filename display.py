@@ -4,6 +4,9 @@
 __author__ = "Umayeer Ahsan"
 
 
+# TODO rename file to util.py
+
+
 import time
 
 
@@ -51,12 +54,28 @@ def is_hidden(card: str) -> bool:
 def get_rank(card: str) -> int:
     '''Return the rank of card as an integer by slicing
     card and including all the characters up to but not including
-    the second last character.'''
+    the second last character.
+    
+    >>> is_hidden("12s0")
+    12
+    >>> is_hidden("3c1")
+    3
+    '''
     
     return int(card[:-2])
 
 
 def get_rank_symbol(rank: int) -> str:
+    '''If rank has a specific character representation of it 
+    in rank_symbols then return it, otherwise, return rank
+    as a string
+    
+    >>> get_rank_symbol(2)
+    "2"
+    >>> get_rank_symbol(1)
+    "A"
+    '''
+    
     if rank in rank_symbols:
         return rank_symbols[rank]
 
@@ -68,7 +87,7 @@ def hand_value(cards: [str]) -> [int]:
     return the possible hand values as an integer list.
     
     If the cards contain an ace, there might be two possible 
-    hand values. In almost all other cases, there will only
+    hand values. In all other cases, there will only
     be one hand value.
     
     There will never be more than two hand values since only
@@ -76,10 +95,10 @@ def hand_value(cards: [str]) -> [int]:
     over 21. Therefore, the returned integer list's length 
     will be: 0 < length <= 2.
     
-    >>> hand_value([ { "rank": "A", "suit": "clubs", "hidden": false } ])
-    [1, 11]
-    >>> hand_value([ { "rank": "K", "suit": "spades", "hidden": false } ])
-    [10]
+    >>> hand_value(["1c0", "2s0"])
+    [3, 13]
+    >>> hand_value(["5d0", "7h1"])
+    [5]
     '''
 
     has_ace = False
@@ -108,13 +127,22 @@ def hand_value(cards: [str]) -> [int]:
         values[0] += 1
         
         # Only include the 'ace as an 11-value card' if it is below 21!
-        if primary_value + 11 < 21:
+        if primary_value + 11 <= 21:
             values.append(primary_value + 11)
     
     return values
             
 
 def hand_state(cards: [dict]) -> str:
+    '''Return, as a string, whether the total value of cards 
+    denotes a blackjack, bust, or it is safe.
+    
+    >>> hand_state(["5c0", "3s0"])
+    "safe"
+    >>> hand_state(["1s0", "10d0"])
+    "blackjack"
+    '''
+
     values = hand_value(cards)
     
     if len(cards) == 2 and max(values) == 21:
@@ -128,6 +156,19 @@ def hand_state(cards: [dict]) -> str:
 
 
 def graphical_hand_state(primary_hand: dict) -> str:
+    '''Determine and return, as a string, the state, hand value(s), and the bet 
+    of primary_hand in a graphical state that will be displayed to the output.
+    
+    >>> graphical_hand_state( { "bet": 15, "cards": ["1s0", "10d0"], "is_split": False, "double_bet": False } )
+    "BLACKJACK - $15.00"
+    
+    >>> graphical_hand_state( { "bet": 10.0, "cards": ["1s0", "5d0"], "is_split": False, "double_bet": False } )
+    "6 / 16 - $10.00"
+    
+    >>> graphical_hand_state( { "bet": 20.0, "cards": ["2s0", "3d0"], "is_split": False, "double_bet": False } )
+    "5 - $20.00"
+    '''
+
     primary_cards = primary_hand["cards"]
     primary_state = hand_state(primary_cards)
     primary_values = hand_value(primary_cards)
@@ -146,20 +187,9 @@ def graphical_hand_state(primary_hand: dict) -> str:
             # in the primary_values list
             if i != (len(primary_values) - 1):
                 state_display += " / "
-    
-    # if secondary_hand != None:
-    #     secondary_values = max(hand_value(secondary_hand["cards"]))
-        
-    #     if min(primary_values) <= 21:
-    #         if max(primary_values) == secondary_values:
-    #             state_display += " (PUSH)"
-    #         elif secondary_values > 21 or max(primary_values) > secondary_values:
-    #             state_display += " (WIN)"
-    #         elif max(primary_values) < secondary_values:
-    #             state_display += " (LOSS)"
         
     if primary_hand["bet"] > 0:
-        state_display += f" - ${primary_hand['bet']}"
+        state_display += f" - ${primary_hand['bet']:.2f}"
 
     return state_display
 
