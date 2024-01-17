@@ -22,7 +22,7 @@ current_balance = 0
 
 settings = {
     # Each settings dictionary will have an additional 'value' 
-    # property (a exact copy of their 'default' property) assigned to them during runtime
+    # property (an exact copy of their 'default' property) assigned to them during runtime
     "surrendering": {
         "default": False,
         "display_name": "Surrendering Enabled",
@@ -45,7 +45,7 @@ settings = {
     },
     "true_random": {
         "default": False,
-        "display_name": "True Random Cards.",
+        "display_name": "True Random Cards",
         "description": "Uses truely (pseudo) random cards instead of using a specific number of decks.\nUse this if you hate card counters.\nWhen true, the 'Deck Count' setting does nothing."
     },
     "deck_count": {
@@ -128,7 +128,7 @@ def shuffle_deck():
 
 #########################
 ## DEPLOY remove this before deploying!
-mock_deck = []
+mock_deck = [11,12,1,10]
 #########################
 
 def draw_card(hidden: bool=False) -> str:
@@ -363,7 +363,7 @@ def reveal_hidden_card(dealer_hand: dict):
 
 def play_dealer(dealer_hand: dict, user_hands: [dict]):
     '''Simulate the dealer's turn by displaying the hidden card, drawing until the
-    dealer_hand's overall value is greater than or equalled to a hard 17, 
+    dealer_hand's overall value is greater than or equal to a hard 17, 
     and displaying the state of the each of the user_hands and the dealer_hand.'''
     
     reveal_hidden_card(dealer_hand)
@@ -387,7 +387,7 @@ def tutorial():
     util.print_yield("  You bet a specific amount before the game begins.")
     util.print_yield("  The objective of the game is simple: get as close to a hand value of 21 as possible WITHOUT going over.")
     util.print_yield("  If you go over, you 'bust', meaning you lose!")
-    util.print_yield("  You are playing against the dearler, who has the same objective.")
+    util.print_yield("  You are playing against the dealer, who has the same objective.")
     util.print_yield("  If the dealer goes over 21, you win!")
     
     print("\nYou:")
@@ -622,7 +622,7 @@ def restart_game():
 
 
 def main():
-    '''Handles the primary input and logic of the game interface.'''
+    '''Handle the primary input and logic of the game interface.'''
     
     global ranks, current_balance
     

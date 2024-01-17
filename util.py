@@ -4,10 +4,10 @@
 __author__ = "Umayeer Ahsan"
 
 
-# TODO rename file to util.py
-
-
+import math
 import time
+
+TITLE_WIDTH = 40
 
 
 suit_symbols = {
@@ -93,7 +93,7 @@ def hand_value(cards: [str]) -> [int]:
     There will never be more than two hand values since only
     one ace can be counted as an 11 at a time without going
     over 21. Therefore, the returned integer list's length 
-    will be: 0 < length <= 2.
+    will be 0 < length <= 2.
     
     >>> hand_value(["1c0", "2s0"])
     [3, 13]
@@ -196,7 +196,7 @@ def graphical_hand_state(primary_hand: dict) -> str:
 def graphical_hand_comparison(primary_cards: [str], secondary_cards: [str]) -> str:
     '''Return, as a string to be displayed in the output, 
     whether the hand value of primary_cards denotes that it is 
-    currently winning, losing, or is in a tie (push) when comapred to 
+    currently winning, losing, or is in a tie (push) when compared to 
     the hand value of secondary_cards.
     
     The returned string is empty if the hand value of primary_cards 
@@ -390,7 +390,7 @@ def print_user_hand(user_hand: dict, dealer_hand: dict, hand_count_ratio: str=No
     and the hand_count_ratio if applicable.
     
     The hand_count_ratio is only available when the user has
-    mutliple hands and it is required to display which one of
+    multiple hands and it is required to display which one of
     their hands this current hand is.
     '''
 
@@ -498,7 +498,11 @@ def print_title(label: str):
     to make it look like a title.'''
     
     print()
-    print(f"--------------- {label} ---------------")
+    
+    dash_width = (TITLE_WIDTH - len(label)) / 2.0
+    left_dashes = "-" * math.floor(dash_width)
+    right_dashes = "-"* math.ceil(dash_width)
+    print(f"{left_dashes} {label} {right_dashes}")
 
 
 def print_goodbye():
