@@ -6,7 +6,6 @@ __author__ = "Umayeer Ahsan"
 
 import util
 import random
-import time
 
 
 ## Constants ##
@@ -129,7 +128,7 @@ def shuffle_deck():
 
 #########################
 ## DEPLOY remove this before deploying!
-mock_deck = [2] * 4
+mock_deck = []
 #########################
 
 def draw_card(hidden: bool=False) -> str:
@@ -437,8 +436,15 @@ def tutorial():
 def start_game():
     '''Commence the main game, handle betting, user's turn, dealer's turn, and display
     the results of the game.'''
-    
+
     global current_balance
+
+    if current_balance <= 0:
+        print()
+        print("You have no money left.")
+        print("Please choose 'Restart game' in the main menu to reset your balance.")
+
+        return
     
     util.print_title("GAME")
 
@@ -635,12 +641,12 @@ def main():
         
         remaining_suits[rank] = available_suits
 
-    util.intro()
+    util.print_intro()
     
     current_balance = DEFAULT_BALANCE
     
     while True:
-        util.menu()
+        util.print_menu()
         decision = get_int_range("> ", 1, 6)
 
         if decision == 1:
@@ -655,7 +661,7 @@ def main():
         elif decision == 5:
             tutorial()
         elif decision == 6:
-            util.goodbye()
+            util.print_goodbye()
             
             break
         
