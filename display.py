@@ -157,14 +157,12 @@ def hand_state(cards: [dict]) -> str:
 
 def graphical_hand_state(primary_hand: dict) -> str:
     '''Determine and return, as a string, the state, hand value(s), and the bet 
-    of primary_hand in a graphical state that will be displayed to the output.
+    of primary_hand in a graphical state that will be displayed in the output.
     
     >>> graphical_hand_state( { "bet": 15, "cards": ["1s0", "10d0"], "is_split": False, "double_bet": False } )
     "BLACKJACK - $15.00"
-    
     >>> graphical_hand_state( { "bet": 10.0, "cards": ["1s0", "5d0"], "is_split": False, "double_bet": False } )
     "6 / 16 - $10.00"
-    
     >>> graphical_hand_state( { "bet": 20.0, "cards": ["2s0", "3d0"], "is_split": False, "double_bet": False } )
     "5 - $20.00"
     '''
@@ -180,6 +178,7 @@ def graphical_hand_state(primary_hand: dict) -> str:
     elif primary_state == "bust":
         state_display += f"{primary_values[0]} (BUST)"
     else:
+        # Iterate through each of the possible hand values
         for i in range(len(primary_values)):
             state_display += str(primary_values[i])
             
@@ -187,7 +186,7 @@ def graphical_hand_state(primary_hand: dict) -> str:
             # in the primary_values list
             if i != (len(primary_values) - 1):
                 state_display += " / "
-        
+    
     if primary_hand["bet"] > 0:
         state_display += f" - ${primary_hand['bet']:.2f}"
 
@@ -195,6 +194,22 @@ def graphical_hand_state(primary_hand: dict) -> str:
 
 
 def graphical_hand_comparison(primary_cards: [str], secondary_cards: [str]) -> str:
+    '''Return, as a string to be displayed in the output, 
+    whether the hand value of primary_cards denotes that it is 
+    currently winning, losing, or is in a tie (push) when comapred to 
+    the hand value of secondary_cards.
+    
+    The returned string is empty if the hand value of primary_cards 
+    denotes that it has busted.
+    
+    >>> graphical_hand_comparison(["1s0", "10d0"], ["2s0", "4c0"])
+    " (WIN)"
+    >>> graphical_hand_comparison(["1s0", "8d0"], ["10s0", "12c0"])
+    " (LOSS)"
+    >>> graphical_hand_comparison(["7s0", "8d0", "10s0"], ["12s0", "6c0"])
+    ""
+    '''
+
     primary_values = hand_value(primary_cards)
     
     # The maximum hand value of the secondary hand value(s)
@@ -215,6 +230,16 @@ def graphical_hand_comparison(primary_cards: [str], secondary_cards: [str]) -> s
 
 
 def get_lines(drawings: [str]) -> [str]:
+    '''Return a list of strings describing what each line should output
+    if the strings in drawings were placed beside each other.
+    
+    It is assumed that each string in drawings has the same height
+    (i.e. has the same number of newline characters).
+    
+    >>> get_lines(["Drawing 1 - Row 1 \nDrawing 1 - Row 2 \nDrawing 1 - Row 3 ", "| Drawing 2 - Row 1\n| Drawing 2 - Row 2\n| Drawing 2 - Row 3"])
+    ['Drawing 1 - Row 1 | Drawing 2 - Row 1', 'Drawing 1 - Row 2 | Drawing 2 - Row 2', 'Drawing 1 - Row 3 | Drawing 2 - Row 3']
+    '''
+
     result = []
     
     COMPLETED = False
@@ -224,13 +249,22 @@ def get_lines(drawings: [str]) -> [str]:
         
         for i in range(len(drawings)):
             drawing = drawings[i]
+            
+            # Determine each line based on newline characters.
             new_line_index = drawing.find('\n')
             
+            # If no newline character is found, we know
+            # that we are on the final line of the drawings.
             if new_line_index == -1:
                 COMPLETED = True
                 current_line += drawing
             else:
+                # Include every character up to but not including the
+                # new line character.
                 current_line += drawing[:new_line_index]
+
+                # Then, remove those characters (including 
+                # the newline) from the original drawing.
                 drawings[i] = drawing[new_line_index + 1:]
         
         result.append(current_line)
@@ -238,7 +272,19 @@ def get_lines(drawings: [str]) -> [str]:
     return result
 
 
-def full_card(hidden: bool):
+def full_card(hidden: bool) -> str:
+    '''Return, as an unformatted string, the graphical representation of
+    an entire hidden card if and only if hidden is true, otherwise, return
+    the graphical representation of an entire visible card.
+    
+    # QUESTION should these be the newline representation or
+    # can they be multiline strings? 
+    >>> full_card(True)
+    "╔═══════════╗\n║        {:>2} ║\n║         {} ║\n║           ║\n║  ╚═════╗  ║\n║  ║  {}  ║  ║\n║  ╚═════╗  ║\n║           ║\n║ {}         ║\n║ {:<2}        ║\n╚═══════════╝"
+    >>> full_card(False)
+    "╔═══════════╗\n║?╔═══════╗?║\n║ ║       ║ ║\n║ ║       ║ ║\n║ ║       ║ ║\n║ ║       ║ ║\n║ ║       ║ ║\n║ ║       ║ ║\n║ ║       ║ ║\n║?╚═══════╝?║\n╚═══════════╝"
+    '''
+
     if hidden == True:
         return """╔═══════════╗
 ║?╔═══════╗?║
@@ -265,7 +311,19 @@ def full_card(hidden: bool):
 ╚═══════════╝"""
 
 
-def half_card(hidden: bool):
+def half_card(hidden: bool) -> str:
+    '''Return, as an unformatted string, the graphical representation of
+    a hidden half card if and only if hidden is true, otherwise, return
+    the graphical representation of a visible half card.
+    
+    # QUESTION should these be the newline representation or
+    # can they be multiline strings? 
+    >>> full_card(True)
+    "═══╗\n═╗?║\n ║ ║\n ║ ║\n ║ ║\n ║ ║\n ║ ║\n ║ ║\n ║ ║\n═╝?║\n═══╝"
+    >>> full_card(False)
+    "═══╗\n{:>2} ║\n {} ║\n   ║\n╗  ║\n║  ║\n╗  ║\n   ║\n   ║\n   ║\n═══╝"
+    '''
+    
     if hidden == True:
         return """═══╗
 ═╗?║
@@ -293,6 +351,9 @@ def half_card(hidden: bool):
 
 
 def print_cards(cards: [str]):
+    '''Retrieve the graphical representation of each card in cards
+    and display them side by side.'''
+
     card_drawings = []
     
     for i in range(len(cards)):
@@ -303,6 +364,8 @@ def print_cards(cards: [str]):
         rank_symbol = get_rank_symbol(rank)
         
         if i == 0:
+            # Only display the full card if it is the top card
+            # in the deck
             drawing = full_card(hidden)
         else:
             drawing = half_card(hidden)
@@ -316,6 +379,9 @@ def print_cards(cards: [str]):
 
 
 def print_dealer_hand(dealer_hand: dict):
+    '''Display information regarding dealer_hand such as the
+    cards it contains and the total hand value.'''
+
     print("Dealer's hand:")
     print_cards(dealer_hand["cards"])
     print("Value: " + graphical_hand_state(dealer_hand))
@@ -323,6 +389,15 @@ def print_dealer_hand(dealer_hand: dict):
 
 
 def print_user_hand(user_hand: dict, dealer_hand: dict, hand_count_ratio: str=None):
+    '''Display information regarding user_hand such as the cards
+    it contains, the hand's value, the hand's state compared to dealer_hand,
+    and the hand_count_ratio if applicable.
+    
+    The hand_count_ratio is only available when the user has
+    mutliple hands and it is required to display which one of
+    their hands this current hand is.
+    '''
+
     hand_count_output = "Your hand"
     
     if hand_count_ratio != None:
@@ -338,11 +413,20 @@ def print_user_hand(user_hand: dict, dealer_hand: dict, hand_count_ratio: str=No
 
 
 def print_hands(dealer_hand: dict, user_hand: [dict], hand_count_ratio: str=None):
+    '''Display the dealer_hand and the user_hand, accounting 
+    for the hand_count_ratio, if applicable.'''
+
     print_dealer_hand(dealer_hand)
     print_user_hand(user_hand, dealer_hand, hand_count_ratio)
 
 
 def print_hands_all(dealer_hand: dict, user_hands: [dict]):
+    '''Display all of the hands in user_hands, comapring them to dealer_hand.
+    
+    If the user has multiple hands, a more minimal and concise
+    interface will be displayed instead of the standard graphical one.
+    '''
+
     print_dealer_hand(dealer_hand)
     
     if len(user_hands) > 1:
@@ -372,11 +456,11 @@ def intro():
 | $$  \ $$| $$      | $$  | $$| $$    $$| $$\  $$ | $$  | $$| $$  | $$| $$    $$| $$\  $$ 
 | $$$$$$$/| $$$$$$$$| $$  | $$|  $$$$$$/| $$ \  $$|  $$$$$$/| $$  | $$|  $$$$$$/| $$ \  $$
 |_______/ |________/|__/  |__/ \______/ |__/  \__/ \______/ |__/  |__/ \______/ |__/  \__/""")
-    # print("------------------------------------------------------------------------------------------")
 
 
-def settings_menu(settings):
-    '''Display the settings interface'''
+def settings_menu(settings: dict):
+    '''Display the settings interface by printing each
+    display name and value of each setting in settings.'''
 
     title("SETTINGS")
     
@@ -386,19 +470,23 @@ def settings_menu(settings):
         print(f"{counter}. {(setting['display_name']):<30}{setting['value']}")
 
 
-def await_continue(message: str = "[press enter to continue...]"):
-    '''Waits for the user to want to continue by asking for an empty input.'''
+def await_continue(message: str="[press enter to continue...]"):
+    '''Prompts the user with message and waits for the 
+    user to want to continue by asking for an empty input.'''
     
     input(message)
 
 
-def print_yield(message: str="", duration: int=.5):
+def print_yield(message: str="", duration: int=0.5):
+    '''Print message in the output and pause the current thread
+    for duration seconds.'''
+
     print(message)
     time.sleep(duration)
 
 
 def menu():
-    '''Display the menu information to the user.'''
+    '''Display the main menu options to the user.'''
     
     title("MENU")
     print("1. Start game")
@@ -410,6 +498,9 @@ def menu():
 
 
 def title(label: str):
+    '''Output label with some dashed lines on each side 
+    to make it look like a title.'''
+    
     print()
     print(f"--------------- {label} ---------------")
 
