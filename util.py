@@ -276,9 +276,7 @@ def full_card(hidden: bool) -> str:
     '''Return, as an unformatted string, the graphical representation of
     an entire hidden card if and only if hidden is true, otherwise, return
     the graphical representation of an entire visible card.
-    
-    # QUESTION should these be the newline representation or
-    # can they be multiline strings? 
+
     >>> full_card(True)
     "╔═══════════╗\n║        {:>2} ║\n║         {} ║\n║           ║\n║  ╚═════╗  ║\n║  ║  {}  ║  ║\n║  ╚═════╗  ║\n║           ║\n║ {}         ║\n║ {:<2}        ║\n╚═══════════╝"
     >>> full_card(False)
@@ -316,11 +314,9 @@ def half_card(hidden: bool) -> str:
     a hidden half card if and only if hidden is true, otherwise, return
     the graphical representation of a visible half card.
     
-    # QUESTION should these be the newline representation or
-    # can they be multiline strings? 
-    >>> full_card(True)
+    >>> half_card(True)
     "═══╗\n═╗?║\n ║ ║\n ║ ║\n ║ ║\n ║ ║\n ║ ║\n ║ ║\n ║ ║\n═╝?║\n═══╝"
-    >>> full_card(False)
+    >>> half_card(False)
     "═══╗\n{:>2} ║\n {} ║\n   ║\n╗  ║\n║  ║\n╗  ║\n   ║\n   ║\n   ║\n═══╝"
     '''
     
@@ -443,7 +439,7 @@ def print_hands_all(dealer_hand: dict, user_hands: [dict]):
         print_user_hand(user_hands[0], dealer_hand)
 
 
-def intro():
+def print_intro():
     '''Display the introduction of the game which 
     only plays at the beginning of the game.'''
 
@@ -458,11 +454,11 @@ def intro():
 |_______/ |________/|__/  |__/ \______/ |__/  \__/ \______/ |__/  |__/ \______/ |__/  \__/""")
 
 
-def settings_menu(settings: dict):
+def print_settings_menu(settings: dict):
     '''Display the settings interface by printing each
     display name and value of each setting in settings.'''
 
-    title("SETTINGS")
+    print_title("SETTINGS")
     
     counter = 0
     for setting in settings.values():
@@ -485,10 +481,10 @@ def print_yield(message: str="", duration: int=0.5):
     time.sleep(duration)
 
 
-def menu():
+def print_menu():
     '''Display the main menu options to the user.'''
     
-    title("MENU")
+    print_title("MENU")
     print("1. Start game")
     print("2. Options")
     print("3. View Balance")
@@ -497,7 +493,7 @@ def menu():
     print("6. Exit")
 
 
-def title(label: str):
+def print_title(label: str):
     '''Output label with some dashed lines on each side 
     to make it look like a title.'''
     
@@ -505,7 +501,7 @@ def title(label: str):
     print(f"--------------- {label} ---------------")
 
 
-def goodbye():
+def print_goodbye():
     '''Display the farewell message displayed when 
     the user quits the game'''
     

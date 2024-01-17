@@ -4,7 +4,7 @@
 __author__ = "Umayeer Ahsan"
 
 
-import display
+import util
 import random
 import time
 
@@ -69,7 +69,7 @@ settings = {
     }
 }
 
-ranks = list(range(1, 14)) # FIXME fix this
+ranks = list(range(1, 14))
 remaining_cards = {}
 remaining_suits = {}
 
@@ -86,8 +86,8 @@ def get_int(message: str) -> int:
             
 
 def get_int_range(message: str, min_: int, max_: int) -> int:
-    '''Prompt the user with message to enter an integer between min_ and max_ 
-    to be returned.
+    '''Prompt the user with message to enter an integer between 
+     min_ and max_ to be returned.
     
     The min_ and max_ are both inclusive.
     '''
@@ -176,7 +176,7 @@ def draw_card(hidden: bool=False) -> str:
     return card
 
 
-def new_hand(bet: float, cards: [str]) -> dict:
+def new_hand(bet: float, cards: [str]) -> dict:   
     '''Create and return a new hand as a dictionary containing
     information such as the bet and the cards it contains.
     
@@ -200,9 +200,9 @@ def hit(hand: dict):
     new_card = draw_card()
     hand["cards"].insert(0, new_card)
     
-    suit_symbol = display.suit_symbols[display.get_suit(new_card)]
+    suit_symbol = util.suit_symbols[util.get_suit(new_card)]
     
-    print(f"Drew a {display.get_rank_symbol(display.get_rank(new_card))}{suit_symbol}.")
+    print(f"Drew a {util.get_rank_symbol(util.get_rank(new_card))}{suit_symbol}.")
     print()
 
 
@@ -255,20 +255,20 @@ def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict
             turn += 1
             
             hand_count_ratio = f"{i+1}/{len(user_hands)}"
-            display.print_hands(dealer_hand, hand, hand_count_ratio)
+            util.print_hands(dealer_hand, hand, hand_count_ratio)
             
             if hand["is_split"] == True or hand["double_bet"] == True:
                 print()
-                display.await_continue("[press enter to draw your final card...]")
+                util.await_continue("[press enter to draw your final card...]")
                     
                 hit(hand)
                 
-                display.print_hands(dealer_hand, hand, hand_count_ratio)
+                util.print_hands(dealer_hand, hand, hand_count_ratio)
                 
                 if hand["is_split"]:
                     # We only provide the option to split if the first and
                     # second cards in the hand have the same rank
-                    if display.get_rank(hand["cards"][0]) == display.get_rank(hand["cards"][1]):
+                    if util.get_rank(hand["cards"][0]) == util.get_rank(hand["cards"][1]):
                         print("Would you like to:\n  (sp)lit\n  (s)tand")
                         decision = get_decision("> ", ['s', "sp"])
                         
@@ -282,10 +282,10 @@ def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict
                             continue
                     else:
                         print()
-                        display.await_continue("[press enter to complete this hand...]")
+                        util.await_continue("[press enter to complete this hand...]")
                 else:
                     print()
-                    display.await_continue("[press enter to end your turn...]")
+                    util.await_continue("[press enter to end your turn...]")
 
                 # Mark the hand as complete if the user does has received a second card.
                 hand_complete = True
@@ -297,7 +297,7 @@ def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict
                     # Allow each of the following decisions if they are enabled
                     # in the settings and the hand state is proper.
                     
-                    if settings["splitting"]["value"] == True and display.get_rank(hand["cards"][0]) == display.get_rank(hand["cards"][1]):
+                    if settings["splitting"]["value"] == True and util.get_rank(hand["cards"][0]) == util.get_rank(hand["cards"][1]):
                         choices_display += "\n  (sp)lit hands"
                         choices.append("sp")
                     
@@ -337,7 +337,7 @@ def play_user(user_hands: [dict], dealer_hand: dict, initial_bet: float) -> dict
                     hand_complete = True
                     turn_state["forfeited"] = True
                 
-            if min(display.hand_value(hand["cards"])) > 21:
+            if min(util.hand_value(hand["cards"])) > 21:
                 print("You have busted!")
                 turn_state["busted"] = True
                 hand_complete = True
@@ -356,10 +356,10 @@ def reveal_hidden_card(dealer_hand: dict):
     
     dealer_hand["cards"][1] = dealer_hand["cards"][1][:-1] + "0"
 
-    suit_symbol = display.suit_symbols[display.get_suit(second_card)]
+    suit_symbol = util.suit_symbols[util.get_suit(second_card)]
     
     print()
-    print(f"The dealer's hidden card was a {display.get_rank_symbol(display.get_rank(second_card))}{suit_symbol}!")
+    print(f"The dealer's hidden card was a {util.get_rank_symbol(util.get_rank(second_card))}{suit_symbol}!")
 
 
 def play_dealer(dealer_hand: dict, user_hands: [dict]):
@@ -368,68 +368,68 @@ def play_dealer(dealer_hand: dict, user_hands: [dict]):
     and displaying the state of the each of the user_hands and the dealer_hand.'''
     
     reveal_hidden_card(dealer_hand)
-    display.print_hands_all(dealer_hand, user_hands)
+    util.print_hands_all(dealer_hand, user_hands)
 
-    while min(display.hand_value(dealer_hand["cards"])) < 17:
+    while min(util.hand_value(dealer_hand["cards"])) < 17:
         print()
-        display.await_continue()
+        util.await_continue()
         hit(dealer_hand)
-        display.print_hands_all(dealer_hand, user_hands)
+        util.print_hands_all(dealer_hand, user_hands)
 
 
 def tutorial():
     '''Display the interactive tutorial dialogue, teaching the user how to play
     the game properly.'''
     
-    display.print_yield("Welcome to BLACKJACK!")
+    util.print_yield("Welcome to BLACKJACK!")
 
     print("Game:")
-    display.print_yield("  Here is how to play:")
-    display.print_yield("  You bet a specific amount before the game begins.")
-    display.print_yield("  The objective of the game is simple: get as close to a hand value of 21 as possible WITHOUT going over.")
-    display.print_yield("  If you go over, you 'bust', meaning you lose!")
-    display.print_yield("  You are playing against the dearler, who has the same objective.")
-    display.print_yield("  If the dealer goes over 21, you win!")
+    util.print_yield("  Here is how to play:")
+    util.print_yield("  You bet a specific amount before the game begins.")
+    util.print_yield("  The objective of the game is simple: get as close to a hand value of 21 as possible WITHOUT going over.")
+    util.print_yield("  If you go over, you 'bust', meaning you lose!")
+    util.print_yield("  You are playing against the dearler, who has the same objective.")
+    util.print_yield("  If the dealer goes over 21, you win!")
     
     print("\nYou:")
-    display.await_continue("  What happens if neither of us go over 21? [press enter to continue...]")
+    util.await_continue("  What happens if neither of us go over 21? [press enter to continue...]")
 
     print("\nGame:")
-    display.print_yield("  Glad you asked!")
-    display.print_yield("  The player that has a closer hand value to 21 wins!")
+    util.print_yield("  Glad you asked!")
+    util.print_yield("  The player that has a closer hand value to 21 wins!")
 
-    print("You:")
-    display.await_continue("  Wow! I'm so excited to play! What are the controls of the game? [press enter to continue...]")
+    print("\nYou:")
+    util.await_continue("  Wow! I'm so excited to play! What are the controls of the game? [press enter to continue...]")
 
     print("\nGame:")
-    display.print_yield("  There are two primary controls:")
-    display.print_yield("    (h)it - You choose to pick up a new card.")
-    display.print_yield("      You can choose to hit for as long as you wish or until you go over 21.")
-    display.print_yield()
-    display.print_yield("    (s)tand - You choose to end your turn.")
-    display.print_yield("      Now the dealer will reveal their card and deal for themself.")
-    display.print_yield("  Assuming you havent busted, once the dealer completes dealing for themself, you have results of the game!")
-    display.print_yield("  If you win, you get twice what you bet. If you lose, you lose everything you bet.")
+    util.print_yield("  There are two primary controls:")
+    util.print_yield("    (h)it - You choose to pick up a new card.")
+    util.print_yield("      You can choose to hit for as long as you wish or until you go over 21.")
+    util.print_yield()
+    util.print_yield("    (s)tand - You choose to end your turn.")
+    util.print_yield("      Now the dealer will reveal their card and deal for themself.")
+    util.print_yield("  Assuming you havent busted, once the dealer completes dealing for themself, you have results of the game!")
+    util.print_yield("  If you win, you get twice what you bet. If you lose, you lose everything you bet.")
     
     print("\nYou:")
-    display.await_continue("  Nice! Seems intuitive. Are there any other things I should be aware of? [press enter to continue...]")
+    util.await_continue("  Nice! Seems intuitive. Are there any other things I should be aware of? [press enter to continue...]")
 
     print("\nGame:")
-    display.print_yield("  Yes, there are two more controls that are only available at specific circumstances:")
-    display.print_yield("    (d)ouble - Double your bet (therefore doubling your return if you win).")
-    display.print_yield("      You can only draw one more card; this will be your final card.")
-    display.print_yield("      Only available on the first turn.")
-    display.print_yield()
-    display.print_yield("    (sp)lit - Split your hand into two separate hands.")
-    display.print_yield("      Your bet will be split evenly between both hands.")
-    display.print_yield("      You can only draw one more card per hand before that hand is complete.")
-    display.print_yield("      Only available when you have only two cards and they are of the same *rank* (not same value).")
+    util.print_yield("  Yes, there are two more controls that are only available at specific circumstances:")
+    util.print_yield("    (d)ouble - Double your bet (therefore doubling your return if you win).")
+    util.print_yield("      You can only draw one more card; this will be your final card.")
+    util.print_yield("      Only available on the first turn.")
+    util.print_yield()
+    util.print_yield("    (sp)lit - Split your hand into two separate hands.")
+    util.print_yield("      Your bet will be split evenly between both hands.")
+    util.print_yield("      You can only draw one more card per hand before that hand is complete.")
+    util.print_yield("      Only available when you have only two cards and they are of the same *rank* (not same value).")
 
     print("\nYou:")
-    display.await_continue("  Great! Let's start the game! [press enter to start a game...]")
+    util.await_continue("  Great! Let's start the game! [press enter to start a game...]")
 
     print("Game:")
-    display.print_yield("  Great! Let's begin.")
+    util.print_yield("  Great! Let's begin.")
 
     start_game()
 
@@ -440,7 +440,7 @@ def start_game():
     
     global current_balance
     
-    display.title("GAME")
+    util.print_title("GAME")
 
     # FIXME do something when the user has no more money
     print(f"Balance: ${current_balance:.2f}")
@@ -453,7 +453,7 @@ def start_game():
     
     shuffle_deck()
     
-    display.print_yield("Dealing cards...", 1)
+    util.print_yield("Dealing cards...", 1)
     
     # Since the user can have multiple hands by splitting,
     # we will have a list that contains all of them.
@@ -477,21 +477,21 @@ def start_game():
         reveal_hidden_card(dealer_hand)
         
         print("Final hands:")
-        display.print_hands_all(dealer_hand, user_hands)
+        util.print_hands_all(dealer_hand, user_hands)
      
         print("Game Over.")
         print(f"Lost bet: {total_bet}")
     else:
         print("Your turn is complete. Dealer will deal now.\n")
-        display.await_continue()
+        util.await_continue()
         
         play_dealer(dealer_hand, user_hands)
-        dealer_values = display.hand_value(dealer_hand["cards"])
+        dealer_values = util.hand_value(dealer_hand["cards"])
         
         # Calculate the user's profit from this game
         profit = 0
         for hand in user_hands:
-            user_values = display.hand_value(hand["cards"])
+            user_values = util.hand_value(hand["cards"])
             
             if min(user_values) <= 21:
                 if max(user_values) == max(dealer_values):
@@ -513,7 +513,7 @@ def start_game():
         print(f"  Total bet: -${total_bet:.2f}")
         print(f"  Total earnings: {sign}${abs(total_outcome):.2f}")
     
-    display.title("GAME OVER")
+    util.print_title("GAME OVER")
     print()
 
 
@@ -566,7 +566,7 @@ def toggle_settings():
     or reading the description of a setting.'''
     
     while True:
-        display.settings_menu(settings)
+        util.print_settings_menu(settings)
         
         selection = get_int_range("Select a setting: ", 1, len(settings))
         
@@ -574,7 +574,7 @@ def toggle_settings():
         if selection == len(settings) - 1:
             reset_settings()
             print()
-            display.await_continue("[press enter to return to settings menu...]")
+            util.await_continue("[press enter to return to settings menu...]")
             continue
 
         # Last option (return to menu).
@@ -597,7 +597,7 @@ def toggle_settings():
             continue
         
         print()
-        display.await_continue("[press enter to return to settings menu...]")
+        util.await_continue("[press enter to return to settings menu...]")
 
 
 def restart_game():
@@ -635,12 +635,12 @@ def main():
         
         remaining_suits[rank] = available_suits
 
-    display.intro()
+    util.intro()
     
     current_balance = DEFAULT_BALANCE
     
     while True:
-        display.menu()
+        util.menu()
         decision = get_int_range("> ", 1, 6)
 
         if decision == 1:
@@ -655,7 +655,7 @@ def main():
         elif decision == 5:
             tutorial()
         elif decision == 6:
-            display.goodbye()
+            util.goodbye()
             
             break
         
