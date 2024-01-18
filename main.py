@@ -128,7 +128,7 @@ def shuffle_deck():
 
 #########################
 ## DEPLOY remove this before deploying!
-mock_deck = []
+mock_deck = [2,2,2,2]
 #########################
 
 def draw_card(hidden: bool=False) -> str:
@@ -484,11 +484,13 @@ def start_game():
     
     if user_result["busted"] or user_result["forfeited"]:
         reveal_hidden_card(dealer_hand)
+
+        util.print_title("GAME OVER")
         
         print("Final hands:")
-        util.print_hands_all(dealer_hand, user_hands)
-     
-        print("Game Over.")
+        print()
+        util.print_hands_all(dealer_hand, user_hands, True)
+
         print(f"Lost bet: {total_bet}")
     else:
         print("Your turn is complete. Dealer will deal now.\n")
@@ -515,6 +517,12 @@ def start_game():
         sign = "" if total_outcome >= 0 else "-"
         
         current_balance += profit
+
+        util.print_title("GAME OVER")
+
+        print("Final hands:")
+        print()
+        util.print_hands_all(dealer_hand, user_hands, True)
         
         print()
         print("Results:")

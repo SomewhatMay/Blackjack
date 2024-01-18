@@ -9,7 +9,6 @@ import time
 
 TITLE_WIDTH = 40
 
-
 suit_symbols = {
     's': '♠',
     'h': '♥',
@@ -133,6 +132,7 @@ def hand_value(cards: [str]) -> [int]:
     return values
             
 
+# TODO useless function basically
 def hand_state(cards: [dict]) -> str:
     '''Return, as a string, whether the total value of cards 
     denotes a blackjack, bust, or it is safe.
@@ -193,20 +193,27 @@ def graphical_hand_state(primary_hand: dict) -> str:
     return state_display
 
 
-def graphical_hand_comparison(primary_cards: [str], secondary_cards: [str]) -> str:
+def graphical_hand_comparison(primary_cards: [str], secondary_cards: [str], game_ended: bool) -> str:
     '''Return, as a string to be displayed in the output, 
     whether the hand value of primary_cards denotes that it is 
     currently winning, losing, or is in a tie (push) when compared to 
-    the hand value of secondary_cards.
+    the hand value of secondary_cards, with a slight tense
+    modification if game_ended is true.
     
     The returned string is empty if the hand value of primary_cards 
     denotes that it has busted.
+
+    If game_ended is false, the tense of the state will be different
+    to inform the user that their hand's state may be different by the
+    end of the game.
+    E.g. if game_ended is false, it will display "WINNING" or "LOSING"
+    However, if game_ended is true, it will display "WIN" or "LOSE".
     
-    >>> graphical_hand_comparison(["1s0", "10d0"], ["2s0", "4c0"])
-    " (WIN)"
-    >>> graphical_hand_comparison(["1s0", "8d0"], ["10s0", "12c0"])
+    >>> graphical_hand_comparison(["1s0", "10d0"], ["2s0", "4c0"], False)
+    " (WINNING)"
+    >>> graphical_hand_comparison(["1s0", "8d0"], ["10s0", "12c0"], True)
     " (LOSS)"
-    >>> graphical_hand_comparison(["7s0", "8d0", "10s0"], ["12s0", "6c0"])
+    >>> graphical_hand_comparison(["7s0", "8d0", "10s0"], ["12s0", "6c0"], False)
     ""
     '''
 
@@ -220,11 +227,11 @@ def graphical_hand_comparison(primary_cards: [str], secondary_cards: [str]) -> s
         
     if min(primary_values) <= 21:
         if max(primary_values) == secondary_value:
-            comparison += " (PUSH)"
+            comparison = " (PUSH)" if game_ended else " (PUSHING)"
         elif secondary_value > 21 or max(primary_values) > secondary_value:
-            comparison += " (WIN)"
+            comparison = " (WIN)" if game_ended else " (WINNING)"
         elif max(primary_values) < secondary_value:
-            comparison += " (LOSS)"
+            comparison = " (LOSS)" if game_ended else " (LOSING)"
     
     return comparison
 
@@ -384,27 +391,39 @@ def print_dealer_hand(dealer_hand: dict):
     print()
 
 
-def print_user_hand(user_hand: dict, dealer_hand: dict, hand_count_ratio: str=None):
-    '''Display information regarding user_hand such as the cards
-    it contains, the hand's value, the hand's state compared to dealer_hand,
-    and the hand_count_ratio if applicable.
+def print_user_hand(user_hand: dict, dealer_hand: dict, game_ended: bool, hand_count_ratio: str=None):
+    '''Display, with a slight tense modification if game_ended is true,
+    information regarding user_hand such as the cards
+    it contains, the hand's value, the hand's state compared to 
+    dealer_hand, and hand_count_ratio if applicable.
     
     The hand_count_ratio is only available when the user has
     multiple hands and it is required to display which one of
     their hands this current hand is.
+    
+    If game_ended is false, the tense of the state will be different
+    to inform the user that their hand's state may be different by the
+    end of the game. 
+    E.g. if game_ended is false, it will display "WINNING" or "LOSING"
+    However, if game_ended is true, it will display "WIN" or "LOSE".
     '''
 
     hand_count_output = "Your hand"
     
     if hand_count_ratio != None:
         hand_count_output += " " + hand_count_ratio
+        
+    state_prefix = ""
+    
+    if game_ended == True:
+        pass
     
     print(hand_count_output + ":")
     
     user_cards = user_hand["cards"]
     dealer_cards = dealer_hand["cards"]
     print_cards(user_cards)
-    print("Value: " + graphical_hand_state(user_hand) + graphical_hand_comparison(user_cards, dealer_cards))
+    print("Value: " + graphical_hand_state(user_hand) + graphical_hand_comparison(user_cards, dealer_cards, game_ended))
     print()
 
 
@@ -413,14 +432,21 @@ def print_hands(dealer_hand: dict, user_hand: [dict], hand_count_ratio: str=None
     for the hand_count_ratio, if applicable.'''
 
     print_dealer_hand(dealer_hand)
-    print_user_hand(user_hand, dealer_hand, hand_count_ratio)
+    print_user_hand(user_hand, dealer_hand, False, hand_count_ratio)
 
 
-def print_hands_all(dealer_hand: dict, user_hands: [dict]):
-    '''Display all of the hands in user_hands, comapring them to dealer_hand.
+def print_hands_all(dealer_hand: dict, user_hands: [dict], game_ended: bool=None):
+    '''Display all of the hands in user_hands, comapring them to dealer_hand and
+    displaying with a slight tense modification if game_ended is true.
     
     If the user has multiple hands, a more minimal and concise
     interface will be displayed instead of the standard graphical one.
+
+    If game_ended is false, the tense of the state will be different
+    to inform the user that their hand's state may be different by the
+    end of the game. 
+    E.g. if game_ended is false, it will display "WINNING" or "LOSING"
+    However, if game_ended is true, it will display "WIN" or "LOSE".
     '''
 
     print_dealer_hand(dealer_hand)
@@ -432,11 +458,11 @@ def print_hands_all(dealer_hand: dict, user_hands: [dict]):
         for i in range(len(user_hands)):
             hand = user_hands[i]
             
-            graphical_state = graphical_hand_state(hand) + graphical_hand_comparison(hand["cards"], dealer_hand["cards"])
+            graphical_state = graphical_hand_state(hand) + graphical_hand_comparison(hand["cards"], dealer_hand["cards"], game_ended)
             print(f"  Hand #{i+1}: {graphical_state}")
     else:
         # Use standard layout
-        print_user_hand(user_hands[0], dealer_hand)
+        print_user_hand(user_hands[0], dealer_hand, game_ended)
 
 
 def print_intro():
