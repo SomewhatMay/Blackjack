@@ -116,6 +116,17 @@ def get_decision(message: str, choices: [str]) -> str:
 def shuffle_deck():
     '''Reset the remaining_cards and the remaining_suits dictionaries with 
     their original values to simulate shuffled decks.'''
+
+    global remaining_cards, remaining_suits
+
+    print(remaining_cards, "\n", remaining_suits)
+
+    util.print_title("")
+    util.print_title("")
+    util.print_title("")
+    util.print_title("Shuffling deck")
+    util.print_title("")
+    util.print_title("")
     
     for rank in ranks:
         remaining_cards[rank] = settings["deck_count"]["value"] * len(SUITS)
@@ -128,7 +139,7 @@ def shuffle_deck():
 
 #########################
 ## DEPLOY remove this before deploying!
-mock_deck = [8,7,1,5,3]
+mock_deck = []
 #########################
 
 def draw_card(hidden: bool=False) -> str:
@@ -139,6 +150,10 @@ def draw_card(hidden: bool=False) -> str:
     The format is f"{rank}{suit}{is_hidden}".
     For example, an ace of hearts that is visible would be stored as "1h0".
     '''
+
+    global remaining_cards, remaining_suits
+
+    print(remaining_suits)
     
     #########################
     ## DEPLOY remove this before deploying!
@@ -166,11 +181,16 @@ def draw_card(hidden: bool=False) -> str:
         remaining_cards[rank] -= 1
         
         available_suits = remaining_suits[rank]
+        print(remaining_cards, rank)
+        print(remaining_suits)
         suit = random.choices(list(available_suits.keys()), weights=list(available_suits.values()))[0]
         available_suits[suit] -= 1
+        print(available_suits)
     
     card = f"{rank}{suit}"
     card += "1" if hidden else "0"
+    
+    print("Returned a card!")
 
     return card
 
@@ -462,7 +482,7 @@ def start_game():
     print(f"Your bet: ${initial_bet}")
     print()
     
-    shuffle_deck()
+    # shuffle_deck()
     
     util.print_yield("Dealing cards...", 1)
     
@@ -630,6 +650,9 @@ def main():
     '''Handle the primary input and logic of the game interface.'''
     
     global ranks, current_balance
+
+    print(remaining_suits)
+    print(remaining_suits)
     
     # Add a 'value' key into each setting and set it as the default.
     for setting in settings.values():
