@@ -128,7 +128,7 @@ def shuffle_deck():
 
 #########################
 ## DEPLOY remove this before deploying!
-mock_deck = [11,12,1,10]
+mock_deck = [8,7,1,5,3]
 #########################
 
 def draw_card(hidden: bool=False) -> str:
@@ -369,11 +369,17 @@ def play_dealer(dealer_hand: dict, user_hands: [dict]):
     reveal_hidden_card(dealer_hand)
     util.print_hands_all(dealer_hand, user_hands)
 
-    while min(util.hand_value(dealer_hand["cards"])) < 17:
+    dealer_value = util.hand_value(dealer_hand["cards"])
+
+    # The dealer only hits if their soft value is less than
+    # or equalled to 17. The dealer must stand for any value
+    # higher than 17, whether it is soft or hard.
+    while min(dealer_value) < 17 and max(dealer_value) < 18:
         print()
         util.await_continue()
         hit(dealer_hand)
         util.print_hands_all(dealer_hand, user_hands)
+        dealer_value = util.hand_value(dealer_hand["cards"])
 
 
 def tutorial():
@@ -448,7 +454,6 @@ def start_game():
     
     util.print_title("GAME")
 
-    # FIXME do something when the user has no more money
     print(f"Balance: ${current_balance:.2f}")
     print("Enter an integer dollar amount to bet: ")
     initial_bet = get_int_range("> $", 1, current_balance) * 1.0
@@ -607,7 +612,7 @@ def toggle_settings():
 
 
 def restart_game():
-    '''Reset the statistics of the user if they confirm they want
+    '''Reset the balance of the user if they confirm they want
     to restart, making it seem like a new game.'''
 
     global current_balance
@@ -654,7 +659,6 @@ def main():
         elif decision == 2:
             toggle_settings()
         elif decision == 3:
-            # TODO Maybe add some other statistics if we have enough time?
             print(f"\nYour balance is ${current_balance:.2f}")
         elif decision == 4:
             restart_game()
