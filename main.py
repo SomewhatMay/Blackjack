@@ -113,6 +113,9 @@ def get_decision(message: str, choices: [str]) -> str:
             print("Please choose a valid option. Try again.")
 
 
+## Main game functions ##
+
+
 def shuffle_deck():
     '''Reset the remaining_cards and the remaining_suits dictionaries with 
     their original values to simulate shuffled decks.'''
@@ -124,22 +127,6 @@ def shuffle_deck():
             remaining_suits[rank][suit] = settings["deck_count"]["value"]
 
 
-## Main game functions ##
-
-#########################
-## DEPLOY remove this before deploying!
-mock_deck = []
-# mock_deck = [1,1,4,2,1] # Soft 17
-# mock_deck = [1,1,10,3,4] # Hard 17
-# mock_deck = [1,1,1,4] # Below soft
-# mock_deck = [1,1,6,7] # Below hard
-# mock_deck = [1,1,1,7] # Above soft
-# mock_deck = [1,1,10,8] # Above hard
-# mock_deck = [1,1,1,11] # Blackjack soft
-# mock_deck = [1,1,11,6,5] # Blackjack hard
-# mock_deck = [1,1,3,4] # Random
-#########################
-
 def draw_card(hidden: bool=False) -> str:
     '''Draw a random card from the deck and return it as a string.
     
@@ -149,21 +136,9 @@ def draw_card(hidden: bool=False) -> str:
     For example, an ace of hearts that is visible would be stored as "1h0".
     '''
     
-    #########################
-    ## DEPLOY remove this before deploying!
-    global mock_deck
-    
     card = ""
-    
-    if len(mock_deck) != 0:
-        rank = mock_deck[0]
-        
-        suit = random.choice(SUITS)
-        
-        mock_deck = mock_deck[1:]
-    #########################
-    
-    elif settings["true_random"]["value"] == True:
+
+    if settings["true_random"]["value"] == True:
         rank = random.choice(ranks)
         suit = random.choice(SUITS)
     else:
@@ -553,6 +528,8 @@ def reset_settings():
 
     for setting in settings.values():
         setting["value"] = setting["default"]
+
+    shuffle_deck()
     
     print("Reset all settings to default value.")
 
@@ -648,6 +625,9 @@ def restart_game():
     
     if decision == 'y':
         current_balance = DEFAULT_BALANCE
+        shuffle_deck()
+
+        util.print_title("RESTARTED GAME")
 
 
 def main():
