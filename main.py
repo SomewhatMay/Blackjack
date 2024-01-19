@@ -482,7 +482,12 @@ def start_game():
         print()
         util.print_hands_all(dealer_hand, user_hands, True)
 
-        print(f"Lost bet: {total_bet}")
+        lost_bet = total_bet
+        
+        if user_result["forfeited"] == True:
+            lost_bet /= 2.0
+
+        print(f"Lost bet: {lost_bet:.2f}")
     else:
         print("Your turn is complete. Dealer will deal now.\n")
         util.await_continue()
