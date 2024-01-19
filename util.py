@@ -130,34 +130,11 @@ def hand_value(cards: [str]) -> [int]:
             values.append(primary_value + 11)
     
     return values
-            
-
-# TODO useless function basically
-def hand_state(cards: [dict]) -> str:
-    '''Return, as a string, whether the total value of cards 
-    denotes a blackjack, bust, or it is safe.
-    
-    >>> hand_state(["5c0", "3s0"])
-    "safe"
-    >>> hand_state(["1s0", "10d0"])
-    "blackjack"
-    '''
-
-    values = hand_value(cards)
-    
-    if len(cards) == 2 and max(values) == 21:
-        state = "blackjack"
-    elif min(values) > 21:
-        state = "bust"
-    else:
-        state = "safe"
-
-    return state
 
 
-def graphical_hand_state(primary_hand: dict) -> str:
+def graphical_hand_state(hand: dict) -> str:
     '''Determine and return, as a string, the state, hand value(s), and the bet 
-    of primary_hand in a graphical state that will be displayed in the output.
+    of hand in a graphical state that will be displayed in the output.
     
     >>> graphical_hand_state( { "bet": 15, "cards": ["1s0", "10d0"], "is_split": False, "double_bet": False } )
     "BLACKJACK - $15.00"
@@ -167,28 +144,27 @@ def graphical_hand_state(primary_hand: dict) -> str:
     "5 - $20.00"
     '''
 
-    primary_cards = primary_hand["cards"]
-    primary_state = hand_state(primary_cards)
-    primary_values = hand_value(primary_cards)
+    cards = hand["cards"]
+    values = hand_value(cards)
     
     state_display = ""
     
-    if primary_state == "blackjack":
+    if len(cards) == 2 and max(values) == 21:
         state_display += "BLACKJACK"
-    elif primary_state == "bust":
-        state_display += f"{primary_values[0]} (BUST)"
+    elif min(values) > 21:
+        state_display += f"{values[0]} (BUST)"
     else:
         # Iterate through each of the possible hand values
-        for i in range(len(primary_values)):
-            state_display += str(primary_values[i])
+        for i in range(len(values)):
+            state_display += str(values[i])
             
             # Only append a slash if it is not the last value
             # in the primary_values list
-            if i != (len(primary_values) - 1):
+            if i != (len(values) - 1):
                 state_display += " / "
     
-    if primary_hand["bet"] > 0:
-        state_display += f" - ${primary_hand['bet']:.2f}"
+    if hand["bet"] > 0:
+        state_display += f" - ${hand['bet']:.2f}"
 
     return state_display
 

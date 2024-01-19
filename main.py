@@ -39,7 +39,7 @@ settings = {
         "description": "When true, enables the option to split on the first round if the user has two of the same value cards.\nEach card is now played as a separate hand."
     },
     "soft_17_hit": {
-        "default": True,
+        "default": False,
         "display_name": "Dealer Hits on Soft 17",
         "description": "When true, dealer must hit on a soft 17. Otherwise, the dealer stands."
     },
@@ -128,7 +128,16 @@ def shuffle_deck():
 
 #########################
 ## DEPLOY remove this before deploying!
-mock_deck = [2,2,2,2]
+mock_deck = []
+# mock_deck = [1,1,4,2,1] # Soft 17
+# mock_deck = [1,1,10,3,4] # Hard 17
+# mock_deck = [1,1,1,4] # Below soft
+# mock_deck = [1,1,6,7] # Below hard
+# mock_deck = [1,1,1,7] # Above soft
+# mock_deck = [1,1,10,8] # Above hard
+# mock_deck = [1,1,1,11] # Blackjack soft
+# mock_deck = [1,1,11,6,5] # Blackjack hard
+# mock_deck = [1,1,3,4] # Random
 #########################
 
 def draw_card(hidden: bool=False) -> str:
@@ -372,9 +381,13 @@ def play_dealer(dealer_hand: dict, user_hands: [dict]):
     dealer_value = util.hand_value(dealer_hand["cards"])
 
     # The dealer only hits if their soft value is less than
-    # or equalled to 17. The dealer must stand for any value
-    # higher than 17, whether it is soft or hard.
-    while min(dealer_value) < 17 and max(dealer_value) < 18:
+    # or equalled to 17 AND soft_17_hit is enabled in settings. 
+    # The dealer must stand for any value higher than 17, 
+    # whether it is soft or hard.
+    # If the soft_17_hit setting is disabled, the dealer will only
+    # hit if the soft value is less than 17.
+    while (settings["soft_17_hit"]["value"] == True and min(dealer_value) < 17 and max(dealer_value) < 18) \
+            or (settings["soft_17_hit"]["value"] == False and max(dealer_value) < 17):
         print()
         util.await_continue()
         hit(dealer_hand)
