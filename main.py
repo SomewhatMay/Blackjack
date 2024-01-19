@@ -1,7 +1,12 @@
-'''Adjustable Blackjack'''
+'''Simple text-based implementation of the Blackjack 
+game with complete features and customizability.
+
+The game includes features such as betting, player's turn, dealer's 
+turn, splitting, doubling down, surrendering, and customizable game settings.
+'''
 
 
-__author__ = "Umayeer Ahsan"
+__author__ = "U Ahsan"
 
 
 import util
@@ -114,8 +119,6 @@ def get_decision(message: str, choices: [str]) -> str:
 
 
 ## Main game functions ##
-
-
 def shuffle_deck():
     '''Reset the remaining_cards and the remaining_suits dictionaries with 
     their original values to simulate shuffled decks.'''

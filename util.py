@@ -1,11 +1,14 @@
-'''Contain functions for displaying the cards in the output'''
+'''Contain utility functions for Blackjack such as functions for 
+displaying graphical interfaces, calculating hand values, comparing hands, 
+and much more.'''
 
 
-__author__ = "Umayeer Ahsan"
+__author__ = "U Ahsan"
 
 
 import math
 import time
+
 
 TITLE_WIDTH = 40
 
