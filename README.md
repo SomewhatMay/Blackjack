@@ -1,3 +1,5 @@
+<img width="1536" height="1024" alt="blackjack-icon-wide" src="https://github.com/user-attachments/assets/5b3f72b2-02f8-41b1-b023-d282a2e1caf8" />
+
 # 🃏 Blackjack Python CLI
 
 A fully-featured, text-based Blackjack CLI game written in Python, designed to be beautiful, functional, and clean. The game is extremely well-documented and commented, making it an excellent resource for anyone learning Python or exploring CLI game development.
@@ -149,4 +151,5 @@ Feel free to fork, submit issues, or make pull requests. Contributions are welco
 ## 📄 License
 
 This project is open source and available under the MIT License.
+
 
